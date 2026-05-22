@@ -1,0 +1,4341 @@
+cat > /mnt/user-data/outputs/poudlard-chronicles.html << 'HTMLEOF'
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poudlard Chronicles — L'Éveil des Arcanes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   POUDLARD CHRONICLES — COMPLETE STYLES
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  --gold: #f0c040;
+  --gold-dim: #a07820;
+  --gold-bright: #ffe080;
+  --deep-purple: #0a0418;
+  --purple: #1a0a38;
+  --purple-mid: #2d1060;
+  --purple-light: #4a2080;
+  --crimson: #8b1a1a;
+  --crimson-bright: #cc2222;
+  --teal: #1a6060;
+  --teal-bright: #20a0a0;
+  --green-slytherin: #1a4a1a;
+  --green-bright: #40cc40;
+  --amber: #ff8c00;
+  --parchment: #f5e8c0;
+  --parchment-dark: #c8b078;
+  --ink: #1a0e00;
+  --white: #fff8f0;
+  --shadow: rgba(0,0,0,0.8);
+  --glow-gold: 0 0 20px rgba(240,192,64,0.6);
+  --glow-blue: 0 0 20px rgba(100,150,255,0.6);
+  --glow-red: 0 0 20px rgba(200,50,50,0.6);
+  --panel-bg: rgba(10,4,24,0.95);
+  --panel-border: rgba(240,192,64,0.3);
+  --font-title: 'Cinzel Decorative', serif;
+  --font-ui: 'Cinzel', serif;
+  --font-body: 'Crimson Pro', serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--deep-purple);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 16px;
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+}
+
+/* ═══ CANVAS & GAME CONTAINER ═══ */
+#game-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  image-rendering: pixelated;
+}
+
+#game-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+}
+
+#game-container > * { pointer-events: auto; }
+
+/* ═══ SPLASH / TITLE SCREEN ═══ */
+#splash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #1a0a38 0%, #0a0418 60%, #000 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.splash-stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, white, transparent),
+    radial-gradient(1px 1px at 30% 50%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(2px 2px at 50% 10%, rgba(240,192,64,0.9), transparent),
+    radial-gradient(1px 1px at 70% 30%, white, transparent),
+    radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(2px 2px at 20% 80%, rgba(150,100,255,0.8), transparent),
+    radial-gradient(1px 1px at 60% 85%, white, transparent),
+    radial-gradient(1px 1px at 40% 40%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 90% 15%, white, transparent),
+    radial-gradient(1px 1px at 15% 60%, rgba(255,255,255,0.9), transparent);
+  background-size: 300px 300px;
+  animation: starsTwinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes starsTwinkle {
+  from { opacity: 0.6; transform: scale(1); }
+  to { opacity: 1; transform: scale(1.02); }
+}
+
+.splash-castle {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: castleFloat 3s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 30px rgba(240,192,64,0.5));
+}
+
+@keyframes castleFloat {
+  from { transform: translateY(0) rotate(-2deg); }
+  to { transform: translateY(-10px) rotate(2deg); }
+}
+
+.splash-title {
+  font-family: var(--font-title);
+  font-size: clamp(28px, 5vw, 52px);
+  color: var(--gold);
+  text-shadow: 0 0 40px rgba(240,192,64,0.8), 0 0 80px rgba(240,192,64,0.4);
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  animation: titlePulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes titlePulse {
+  from { text-shadow: 0 0 40px rgba(240,192,64,0.8), 0 0 80px rgba(240,192,64,0.4); }
+  to { text-shadow: 0 0 60px rgba(240,192,64,1), 0 0 120px rgba(240,192,64,0.6); }
+}
+
+.splash-subtitle {
+  font-family: var(--font-ui);
+  font-size: clamp(12px, 2vw, 18px);
+  color: var(--parchment-dark);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 60px;
+}
+
+.btn-magic {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold), var(--gold-dim));
+  border: 2px solid var(--gold-bright);
+  padding: 16px 48px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 30px rgba(240,192,64,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-magic::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: conic-gradient(transparent 0deg, rgba(255,255,255,0.3) 60deg, transparent 120deg);
+  animation: btnShine 2s linear infinite;
+}
+
+@keyframes btnShine {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.btn-magic:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 50px rgba(240,192,64,0.7);
+}
+
+.splash-version {
+  position: absolute;
+  bottom: 20px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  font-family: var(--font-ui);
+  letter-spacing: 2px;
+}
+
+/* ═══ CHARACTER CREATION ═══ */
+#char-creation {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #1a0a38 0%, #0a0418 100%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.creation-panel {
+  background: rgba(10,4,24,0.95);
+  border: 1px solid var(--gold-dim);
+  border-radius: 8px;
+  padding: 40px;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 0 60px rgba(240,192,64,0.1), inset 0 0 40px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.creation-panel::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 20%; right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.panel-title {
+  font-family: var(--font-title);
+  font-size: 28px;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 8px;
+  text-shadow: var(--glow-gold);
+}
+
+.panel-subtitle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--parchment-dark);
+  text-align: center;
+  letter-spacing: 2px;
+  margin-bottom: 32px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--gold-dim);
+  border-radius: 4px;
+  padding: 12px 16px;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.form-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 15px rgba(240,192,64,0.2);
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.avatar-option {
+  background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(240,192,64,0.2);
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 28px;
+}
+
+.avatar-option:hover, .avatar-option.selected {
+  border-color: var(--gold);
+  background: rgba(240,192,64,0.1);
+  box-shadow: 0 0 15px rgba(240,192,64,0.2);
+  transform: scale(1.05);
+}
+
+.wand-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.wand-option {
+  background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(240,192,64,0.2);
+  border-radius: 6px;
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.wand-option:hover, .wand-option.selected {
+  border-color: var(--gold);
+  background: rgba(240,192,64,0.1);
+  transform: scale(1.02);
+}
+
+.wand-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+.wand-name { font-size: 11px; font-family: var(--font-ui); color: var(--parchment-dark); }
+
+.btn-next {
+  width: 100%;
+  margin-top: 20px;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+  border: none;
+  padding: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+
+.btn-next:hover { transform: scale(1.02); box-shadow: var(--glow-gold); }
+
+/* ═══ SORTING HAT QUIZ ═══ */
+#sorting-hat {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #2a0010 0%, #0a0418 100%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 950;
+  padding: 20px;
+}
+
+.hat-container { text-align: center; }
+
+.hat-emoji {
+  font-size: 100px;
+  display: block;
+  animation: hatBob 1s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 20px rgba(240,192,64,0.5));
+}
+
+@keyframes hatBob {
+  from { transform: translateY(0) rotate(-5deg); }
+  to { transform: translateY(-15px) rotate(5deg); }
+}
+
+.hat-speech {
+  background: rgba(10,4,24,0.95);
+  border: 1px solid var(--gold-dim);
+  border-radius: 8px;
+  padding: 30px;
+  max-width: 600px;
+  margin: 20px auto;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--parchment);
+}
+
+.quiz-question {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  color: var(--gold);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.quiz-answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.quiz-answer {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+  padding: 16px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--white);
+  transition: all 0.3s;
+  text-align: left;
+}
+
+.quiz-answer:hover {
+  background: rgba(240,192,64,0.1);
+  border-color: var(--gold);
+  transform: translateX(4px);
+}
+
+.house-result {
+  display: none;
+  text-align: center;
+  padding: 20px;
+}
+
+.house-badge {
+  font-size: 80px;
+  display: block;
+  animation: badgeSpin 2s ease-out forwards;
+}
+
+@keyframes badgeSpin {
+  from { transform: scale(0) rotate(-360deg); opacity: 0; }
+  to { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.house-name {
+  font-family: var(--font-title);
+  font-size: 42px;
+  margin: 16px 0 8px;
+}
+
+.house-motto {
+  font-style: italic;
+  color: var(--parchment-dark);
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+/* ═══ HUD ═══ */
+#hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 70px;
+  background: linear-gradient(180deg, rgba(5,2,12,0.98) 0%, rgba(5,2,12,0.7) 100%);
+  border-bottom: 1px solid rgba(240,192,64,0.2);
+  display: none;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.hud-avatar {
+  width: 48px; height: 48px;
+  background: rgba(240,192,64,0.1);
+  border: 2px solid var(--gold-dim);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.hud-avatar:hover { border-color: var(--gold); box-shadow: var(--glow-gold); }
+
+.hud-info { flex: 1; }
+
+.hud-name {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+.hud-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.hud-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-bar-label {
+  font-size: 10px;
+  font-family: var(--font-ui);
+  color: var(--parchment-dark);
+  width: 16px;
+  letter-spacing: 1px;
+}
+
+.hud-bar {
+  width: 100px;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.hud-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.bar-hp .hud-bar-fill { background: linear-gradient(90deg, #cc2222, #ff4444); }
+.bar-mp .hud-bar-fill { background: linear-gradient(90deg, #2244cc, #4488ff); }
+.bar-xp .hud-bar-fill { background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
+
+.hud-stats {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.hud-stat {
+  text-align: center;
+}
+
+.hud-stat-val {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  color: var(--gold);
+  display: block;
+}
+
+.hud-stat-lbl {
+  font-size: 9px;
+  color: var(--parchment-dark);
+  letter-spacing: 1px;
+}
+
+.hud-location {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--parchment-dark);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+.hud-house-badge { font-size: 20px; }
+
+.hud-time {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--gold);
+  text-align: right;
+}
+
+.hud-weather { font-size: 18px; }
+
+/* ═══ BOTTOM NAV ═══ */
+#bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 70px;
+  background: linear-gradient(0deg, rgba(5,2,12,0.98) 0%, rgba(5,2,12,0.7) 100%);
+  border-top: 1px solid rgba(240,192,64,0.2);
+  display: none;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  transition: all 0.3s;
+  color: var(--parchment-dark);
+}
+
+.nav-btn:hover, .nav-btn.active {
+  border-color: var(--gold-dim);
+  background: rgba(240,192,64,0.08);
+  color: var(--gold);
+}
+
+.nav-btn-icon { font-size: 22px; }
+
+.nav-btn-label {
+  font-size: 9px;
+  font-family: var(--font-ui);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ═══ WORLD MAP / GAME AREA ═══ */
+#world {
+  position: fixed;
+  top: 70px; bottom: 70px;
+  left: 0; right: 0;
+  display: none;
+  overflow: hidden;
+  background: #0a0a1a;
+}
+
+.world-scene {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.world-scene.active { display: block; }
+
+/* ═══ SCENE: POUDLARD EXTERIOR ═══ */
+#scene-hogwarts {
+  background: radial-gradient(ellipse at 50% 110%, #1a0a38 0%, #0a0418 60%, #050210 100%);
+}
+
+/* ═══ SCENE: GREAT HALL ═══ */
+#scene-great-hall {
+  background: radial-gradient(ellipse at 50% 0%, #2a1a0a 0%, #1a0810 40%, #0a0418 100%);
+}
+
+/* ═══ SCENE: DIAGON ALLEY ═══ */
+#scene-diagon {
+  background: radial-gradient(ellipse at 30% 110%, #0a1a0a 0%, #05100a 50%, #020810 100%);
+}
+
+/* ═══ SCENE: FORBIDDEN FOREST ═══ */
+#scene-forest {
+  background: radial-gradient(ellipse at 50% 0%, #001a00 0%, #001005 50%, #000810 100%);
+}
+
+/* ═══ SCENE: HOGSMEADE ═══ */
+#scene-hogsmeade {
+  background: radial-gradient(ellipse at 50% 110%, #0a1020 0%, #050815 50%, #020510 100%);
+}
+
+/* ═══ MINIMAP ═══ */
+#minimap {
+  position: fixed;
+  top: 80px; right: 12px;
+  width: 140px;
+  height: 120px;
+  background: rgba(5,2,12,0.95);
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+  padding: 8px;
+  z-index: 90;
+  display: none;
+}
+
+.minimap-title {
+  font-family: var(--font-ui);
+  font-size: 8px;
+  color: var(--gold-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.minimap-canvas {
+  width: 100%;
+  height: 80px;
+  background: rgba(10,4,24,0.8);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.minimap-dot {
+  position: absolute;
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--gold);
+  transition: all 0.5s;
+}
+
+.minimap-zone {
+  position: absolute;
+  border-radius: 2px;
+  font-size: 6px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.minimap-zone:hover {
+  brightness: 1.5;
+  border-color: var(--gold);
+}
+
+/* ═══ PANEL SYSTEM ═══ */
+.panel-overlay {
+  position: fixed;
+  inset: 70px 0 70px 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.panel-overlay.open { display: flex; }
+
+.panel-box {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 100%;
+  overflow-y: auto;
+  box-shadow: 0 0 60px rgba(240,192,64,0.1);
+  position: relative;
+}
+
+.panel-box::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 20%; right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.panel-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-header-title {
+  font-family: var(--font-title);
+  font-size: 20px;
+  color: var(--gold);
+}
+
+.panel-close {
+  background: none;
+  border: 1px solid var(--gold-dim);
+  color: var(--gold-dim);
+  width: 28px; height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s;
+}
+
+.panel-close:hover { border-color: var(--gold); color: var(--gold); }
+
+.panel-body { padding: 20px 24px; }
+
+/* ═══ INVENTORY ═══ */
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.inv-slot {
+  aspect-ratio: 1;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(240,192,64,0.15);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 6px;
+  position: relative;
+}
+
+.inv-slot:hover {
+  border-color: var(--gold-dim);
+  background: rgba(240,192,64,0.05);
+}
+
+.inv-slot.occupied {
+  border-color: rgba(240,192,64,0.3);
+}
+
+.inv-slot-icon { font-size: 22px; }
+
+.inv-slot-name {
+  font-size: 8px;
+  font-family: var(--font-ui);
+  color: var(--parchment-dark);
+  text-align: center;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.inv-slot-qty {
+  position: absolute;
+  top: 3px; right: 5px;
+  font-size: 9px;
+  color: var(--gold);
+  font-family: var(--font-ui);
+}
+
+.inv-gold {
+  background: rgba(240,192,64,0.1);
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.inv-currency {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--gold);
+}
+
+/* ═══ SKILLS ═══ */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.skill-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(240,192,64,0.15);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.skill-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.skill-name {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--parchment);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skill-level {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--gold);
+}
+
+.skill-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  transition: width 0.8s ease;
+}
+
+/* ═══ QUESTS ═══ */
+.quest-item {
+  border: 1px solid rgba(240,192,64,0.2);
+  border-radius: 6px;
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: rgba(255,255,255,0.02);
+}
+
+.quest-item:hover { border-color: var(--gold-dim); background: rgba(240,192,64,0.05); }
+
+.quest-item.active { border-color: var(--gold); background: rgba(240,192,64,0.08); }
+
+.quest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.quest-name {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--gold);
+}
+
+.quest-badge {
+  font-size: 10px;
+  font-family: var(--font-ui);
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+
+.quest-badge.main { background: rgba(200,50,50,0.3); color: #ff8888; border: 1px solid rgba(200,50,50,0.4); }
+.quest-badge.side { background: rgba(50,100,200,0.3); color: #88aaff; border: 1px solid rgba(50,100,200,0.4); }
+.quest-badge.done { background: rgba(50,150,50,0.3); color: #88ff88; border: 1px solid rgba(50,150,50,0.4); }
+
+.quest-desc {
+  font-size: 13px;
+  color: var(--parchment-dark);
+  line-height: 1.5;
+}
+
+.quest-progress {
+  margin-top: 8px;
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.quest-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--teal-bright));
+  border-radius: 2px;
+  transition: width 0.5s;
+}
+
+/* ═══ DIALOGUE SYSTEM ═══ */
+#dialogue-box {
+  position: fixed;
+  bottom: 80px; left: 16px; right: 16px;
+  background: rgba(5,2,12,0.98);
+  border: 1px solid var(--gold-dim);
+  border-radius: 8px;
+  padding: 20px 24px;
+  z-index: 150;
+  display: none;
+  box-shadow: 0 -4px 30px rgba(240,192,64,0.1);
+}
+
+#dialogue-box::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 15%; right: 15%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.dialogue-speaker {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialogue-text {
+  font-size: 15px;
+  color: var(--parchment);
+  line-height: 1.7;
+  font-style: italic;
+  margin-bottom: 14px;
+  min-height: 40px;
+}
+
+.dialogue-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dialogue-choice {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(240,192,64,0.2);
+  border-radius: 4px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--white);
+  text-align: left;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialogue-choice::before { content: '◆'; color: var(--gold-dim); font-size: 10px; }
+
+.dialogue-choice:hover {
+  border-color: var(--gold);
+  background: rgba(240,192,64,0.08);
+  transform: translateX(4px);
+}
+
+.dialogue-continue {
+  text-align: right;
+  font-size: 11px;
+  font-family: var(--font-ui);
+  color: var(--gold-dim);
+  cursor: pointer;
+  letter-spacing: 2px;
+  animation: blink 1s ease-in-out infinite alternate;
+}
+
+@keyframes blink { from { opacity: 0.4; } to { opacity: 1; } }
+
+/* ═══ DUEL SYSTEM ═══ */
+#duel-screen {
+  position: fixed;
+  inset: 70px 0 70px;
+  background: radial-gradient(ellipse at center, #1a001a 0%, #0a0010 100%);
+  display: none;
+  flex-direction: column;
+  z-index: 300;
+  padding: 20px;
+}
+
+.duel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.duel-combatant {
+  text-align: center;
+  flex: 1;
+}
+
+.duel-name {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.duel-hp-bar {
+  height: 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.duel-hp-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.player-hp { background: linear-gradient(90deg, #cc2222, #ff4444); }
+.enemy-hp { background: linear-gradient(90deg, #224488, #4488ff); }
+
+.duel-vs {
+  font-family: var(--font-title);
+  font-size: 24px;
+  color: var(--gold);
+  text-shadow: var(--glow-gold);
+  padding: 0 20px;
+}
+
+.duel-arena {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  margin: 20px 0;
+}
+
+.duel-figure {
+  font-size: 60px;
+  animation: duelFloat 2s ease-in-out infinite alternate;
+}
+
+@keyframes duelFloat {
+  from { transform: translateY(0); }
+  to { transform: translateY(-12px); }
+}
+
+.duel-figure.enemy { animation-delay: 0.5s; }
+
+.duel-beam {
+  width: 100px; height: 4px;
+  background: linear-gradient(90deg, #4444ff, #ff4444);
+  border-radius: 2px;
+  box-shadow: 0 0 20px rgba(100,100,255,0.8);
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+
+.duel-beam.active { transform: scaleX(1); }
+
+.duel-log {
+  height: 80px;
+  overflow-y: auto;
+  padding: 10px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(240,192,64,0.1);
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--parchment);
+}
+
+.duel-log-entry {
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.duel-log-entry.player { color: #88aaff; }
+.duel-log-entry.enemy { color: #ff8888; }
+.duel-log-entry.system { color: var(--gold); }
+
+.duel-spells {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.duel-spell {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+  padding: 10px 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.duel-spell:hover {
+  background: rgba(240,192,64,0.1);
+  border-color: var(--gold);
+  transform: scale(1.05);
+}
+
+.duel-spell:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.spell-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.spell-name { font-size: 10px; font-family: var(--font-ui); color: var(--gold); letter-spacing: 0.5px; }
+.spell-mp { font-size: 9px; color: var(--parchment-dark); margin-top: 2px; }
+
+/* ═══ SHOP ═══ */
+.shop-items {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.shop-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(240,192,64,0.15);
+  border-radius: 6px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.shop-item:hover {
+  border-color: var(--gold-dim);
+  background: rgba(240,192,64,0.05);
+  transform: scale(1.02);
+}
+
+.shop-item-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.shop-item-icon { font-size: 24px; }
+
+.shop-item-name {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--gold);
+}
+
+.shop-item-desc {
+  font-size: 12px;
+  color: var(--parchment-dark);
+  margin-bottom: 8px;
+}
+
+.shop-item-price {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--gold-bright);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ═══ POTION MINI-GAME ═══ */
+#potion-game {
+  position: fixed;
+  inset: 70px 0 70px;
+  background: radial-gradient(ellipse at center, #001a10 0%, #000a08 100%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  z-index: 300;
+}
+
+.potion-cauldron {
+  font-size: 80px;
+  animation: cauldronBubble 1s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 20px rgba(0,200,100,0.5));
+}
+
+@keyframes cauldronBubble {
+  from { transform: scale(1) rotate(-2deg); }
+  to { transform: scale(1.05) rotate(2deg); }
+}
+
+.potion-recipe {
+  background: rgba(5,20,10,0.9);
+  border: 1px solid rgba(0,200,100,0.3);
+  border-radius: 6px;
+  padding: 16px 24px;
+  margin: 16px 0;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.potion-recipe-title {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: #00cc66;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.potion-ingredients {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.potion-ingredient {
+  background: rgba(0,100,50,0.2);
+  border: 1px solid rgba(0,200,100,0.2);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--parchment);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.potion-ingredient.added {
+  border-color: #00cc66;
+  background: rgba(0,200,100,0.15);
+  color: #88ffcc;
+}
+
+.potion-slots {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  max-width: 480px;
+  width: 100%;
+  margin: 16px 0;
+}
+
+.potion-slot {
+  aspect-ratio: 1;
+  background: rgba(0,100,50,0.1);
+  border: 1px solid rgba(0,200,100,0.2);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 20px;
+  padding: 8px;
+}
+
+.potion-slot:hover {
+  border-color: #00cc66;
+  background: rgba(0,200,100,0.1);
+  transform: scale(1.08);
+}
+
+.potion-slot-name {
+  font-size: 8px;
+  font-family: var(--font-ui);
+  color: rgba(0,200,100,0.7);
+  margin-top: 2px;
+  text-align: center;
+}
+
+.potion-btn {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #005530, #00aa60);
+  border: 1px solid #00cc66;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.3s;
+}
+
+.potion-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0,200,100,0.4);
+}
+
+/* ═══ MAP SCREEN ═══ */
+#map-screen {
+  position: fixed;
+  inset: 70px 0 70px;
+  display: none;
+  background: radial-gradient(ellipse at center, #0a0820 0%, #050410 100%);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 200;
+}
+
+.map-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.map-location {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(240,192,64,0.2);
+  border-radius: 8px;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+
+.map-location::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(240,192,64,0.05) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.map-location:hover::before { opacity: 1; }
+
+.map-location:hover {
+  border-color: var(--gold);
+  transform: scale(1.04);
+  box-shadow: 0 4px 20px rgba(240,192,64,0.15);
+}
+
+.map-location.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.map-location.current {
+  border-color: var(--gold);
+  box-shadow: 0 0 20px rgba(240,192,64,0.2);
+}
+
+.map-loc-icon { font-size: 32px; display: block; margin-bottom: 6px; }
+.map-loc-name {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.map-loc-desc {
+  font-size: 11px;
+  color: var(--parchment-dark);
+  margin-top: 4px;
+}
+
+.map-loc-lock {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+/* ═══ NOTIFICATIONS ═══ */
+#notifications {
+  position: fixed;
+  top: 80px; left: 16px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 280px;
+}
+
+.notif {
+  background: rgba(5,2,12,0.97);
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--parchment);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: notifSlide 0.4s ease-out, notifFade 0.4s ease-in 3s forwards;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+@keyframes notifSlide {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes notifFade {
+  from { opacity: 1; }
+  to { opacity: 0; pointer-events: none; }
+}
+
+.notif-icon { font-size: 18px; }
+.notif-text { flex: 1; }
+.notif-title { font-family: var(--font-ui); font-size: 11px; color: var(--gold); margin-bottom: 2px; }
+
+.notif.xp { border-color: var(--gold-dim); }
+.notif.quest { border-color: rgba(100,200,255,0.4); }
+.notif.warning { border-color: rgba(255,100,100,0.4); }
+.notif.success { border-color: rgba(100,255,100,0.4); }
+
+/* ═══ NPC ═══ */
+.npc {
+  position: absolute;
+  cursor: pointer;
+  transition: transform 0.3s;
+  text-align: center;
+  user-select: none;
+}
+
+.npc:hover { transform: scale(1.15); }
+
+.npc-sprite {
+  font-size: 32px;
+  display: block;
+  animation: npcFloat 2.5s ease-in-out infinite alternate;
+}
+
+.npc-name {
+  font-size: 9px;
+  font-family: var(--font-ui);
+  color: var(--gold);
+  display: block;
+  text-shadow: 0 1px 4px black;
+  background: rgba(0,0,0,0.6);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-top: 2px;
+}
+
+@keyframes npcFloat {
+  from { transform: translateY(0); }
+  to { transform: translateY(-6px); }
+}
+
+/* ═══ PLAYER SPRITE ═══ */
+#player {
+  position: absolute;
+  text-align: center;
+  z-index: 10;
+  pointer-events: none;
+  transition: left 0.3s, top 0.3s;
+}
+
+#player-sprite {
+  font-size: 36px;
+  display: block;
+  filter: drop-shadow(0 0 8px rgba(240,192,64,0.5));
+}
+
+.player-name-tag {
+  font-size: 9px;
+  font-family: var(--font-ui);
+  color: var(--gold);
+  background: rgba(0,0,0,0.7);
+  border-radius: 3px;
+  padding: 1px 6px;
+  display: block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ═══ SCENE ELEMENTS ═══ */
+.scene-element {
+  position: absolute;
+  cursor: pointer;
+  transition: transform 0.3s, filter 0.3s;
+  text-align: center;
+  font-size: 40px;
+}
+
+.scene-element:hover {
+  transform: scale(1.1);
+  filter: brightness(1.3);
+}
+
+.scene-label {
+  font-size: 10px;
+  font-family: var(--font-ui);
+  color: var(--gold-dim);
+  text-align: center;
+  display: block;
+  background: rgba(0,0,0,0.6);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+/* ═══ DAY/NIGHT OVERLAY ═══ */
+#daynight {
+  position: fixed;
+  inset: 70px 0 70px;
+  pointer-events: none;
+  z-index: 50;
+  transition: background 30s linear;
+  mix-blend-mode: multiply;
+}
+
+/* ═══ WEATHER EFFECTS ═══ */
+#weather-overlay {
+  position: fixed;
+  inset: 70px 0 70px;
+  pointer-events: none;
+  z-index: 51;
+  overflow: hidden;
+}
+
+.rain-drop {
+  position: absolute;
+  top: -20px;
+  width: 2px;
+  height: 15px;
+  background: linear-gradient(180deg, transparent, rgba(150,200,255,0.6));
+  border-radius: 1px;
+  animation: rainFall linear infinite;
+}
+
+@keyframes rainFall {
+  from { transform: translateY(-20px) rotate(15deg); }
+  to { transform: translateY(100vh) rotate(15deg); }
+}
+
+.snow-flake {
+  position: absolute;
+  top: -20px;
+  color: white;
+  font-size: 12px;
+  animation: snowFall linear infinite;
+}
+
+@keyframes snowFall {
+  from { transform: translateY(-20px) rotate(0deg); }
+  to { transform: translateY(100vh) rotate(720deg); }
+}
+
+.magic-particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  animation: magicFloat linear infinite;
+  pointer-events: none;
+}
+
+@keyframes magicFloat {
+  0% { transform: translateY(100%) rotate(0deg); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ═══ QUIDDITCH ═══ */
+#quidditch-screen {
+  position: fixed;
+  inset: 70px 0 70px;
+  background: radial-gradient(ellipse at 50% 30%, #0a2030 0%, #030810 100%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  z-index: 300;
+}
+
+.quidditch-title {
+  font-family: var(--font-title);
+  font-size: 24px;
+  color: var(--gold);
+  margin-bottom: 16px;
+  text-shadow: var(--glow-gold);
+}
+
+.quidditch-field {
+  width: 100%;
+  max-width: 500px;
+  height: 200px;
+  background: radial-gradient(ellipse at center, #1a4a1a 0%, #0a2a0a 100%);
+  border: 2px solid rgba(240,192,64,0.3);
+  border-radius: 50%;
+  position: relative;
+  margin: 8px 0;
+  overflow: hidden;
+}
+
+.quidditch-player {
+  position: absolute;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quidditch-snitch {
+  position: absolute;
+  font-size: 14px;
+  animation: snitchFly 2s ease-in-out infinite;
+}
+
+@keyframes snitchFly {
+  0% { transform: translate(0,0) rotate(0deg); }
+  25% { transform: translate(30px,-20px) rotate(90deg); }
+  50% { transform: translate(-20px,30px) rotate(180deg); }
+  75% { transform: translate(40px,10px) rotate(270deg); }
+  100% { transform: translate(0,0) rotate(360deg); }
+}
+
+.quidditch-score {
+  font-family: var(--font-ui);
+  font-size: 20px;
+  color: var(--gold);
+  margin: 8px 0;
+  letter-spacing: 4px;
+}
+
+.quidditch-timer {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--parchment-dark);
+}
+
+.quidditch-controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  max-width: 300px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.q-btn {
+  background: rgba(240,192,64,0.1);
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+  padding: 12px;
+  color: var(--gold);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.q-btn:hover {
+  background: rgba(240,192,64,0.2);
+  border-color: var(--gold);
+}
+
+/* ═══ PROFILE SCREEN ═══ */
+#profile-screen {
+  position: fixed;
+  inset: 70px 0 70px;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 200;
+}
+
+.profile-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 480px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.profile-avatar-big {
+  width: 64px; height: 64px;
+  background: rgba(240,192,64,0.1);
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+  box-shadow: var(--glow-gold);
+}
+
+.profile-name {
+  font-family: var(--font-title);
+  font-size: 22px;
+  color: var(--gold);
+}
+
+.profile-house {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--parchment-dark);
+  margin-top: 4px;
+}
+
+.profile-year {
+  font-size: 11px;
+  font-family: var(--font-ui);
+  color: var(--gold-dim);
+  margin-top: 2px;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.stat-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(240,192,64,0.15);
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+
+.stat-box-val {
+  font-family: var(--font-ui);
+  font-size: 22px;
+  color: var(--gold);
+  display: block;
+}
+
+.stat-box-lbl {
+  font-size: 10px;
+  color: var(--parchment-dark);
+  font-family: var(--font-ui);
+  letter-spacing: 1px;
+}
+
+/* ═══ RELATIONSHIP SYSTEM ═══ */
+.npc-relations {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.relation-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid rgba(240,192,64,0.1);
+  border-radius: 5px;
+}
+
+.relation-icon { font-size: 20px; }
+.relation-name { font-family: var(--font-ui); font-size: 12px; color: var(--gold); flex: 1; }
+
+.relation-bar {
+  width: 80px; height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.relation-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #884444, #ff8888, #44aa44);
+  transition: width 0.5s;
+}
+
+/* ═══ FLOATING PARTICLES ═══ */
+.float-particle {
+  position: absolute;
+  pointer-events: none;
+  animation: floatUp 2s ease-out forwards;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  z-index: 500;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+/* ═══ SCENE BACKGROUNDS ═══ */
+.bg-hogwarts-sky {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 55%;
+  background: linear-gradient(180deg,
+    #050215 0%,
+    #0a0428 30%,
+    #140840 60%,
+    #1a0a50 100%
+  );
+}
+
+.bg-stars {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 40%;
+  background-image:
+    radial-gradient(1px 1px at 5% 10%, white, transparent),
+    radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(2px 2px at 25% 8%, rgba(240,192,64,0.9), transparent),
+    radial-gradient(1px 1px at 35% 20%, white, transparent),
+    radial-gradient(1px 1px at 45% 15%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 55% 30%, white, transparent),
+    radial-gradient(2px 2px at 65% 5%, rgba(150,100,255,0.8), transparent),
+    radial-gradient(1px 1px at 75% 18%, white, transparent),
+    radial-gradient(1px 1px at 85% 12%, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 92% 25%, white, transparent),
+    radial-gradient(1px 1px at 10% 35%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 48% 28%, white, transparent);
+  background-size: 400px 300px;
+  animation: starsTwinkle 5s ease-in-out infinite alternate;
+}
+
+.bg-ground {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 50%;
+}
+
+.bg-castle {
+  position: absolute;
+  bottom: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 120px;
+  filter: drop-shadow(0 0 40px rgba(240,192,64,0.2));
+  animation: castleGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes castleGlow {
+  from { filter: drop-shadow(0 0 20px rgba(240,192,64,0.2)); }
+  to { filter: drop-shadow(0 0 50px rgba(240,192,64,0.4)); }
+}
+
+.bg-lake {
+  position: absolute;
+  bottom: 5%;
+  left: 10%; right: 10%;
+  height: 30%;
+  background: radial-gradient(ellipse at center, rgba(30,60,120,0.6) 0%, rgba(10,20,60,0.4) 100%);
+  border-radius: 50%;
+  border: 1px solid rgba(100,150,255,0.1);
+}
+
+/* ═══ SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+/* ═══ LEVEL UP SCREEN ═══ */
+#levelup-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 600;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.levelup-container {
+  text-align: center;
+  animation: levelupAppear 0.5s ease-out;
+}
+
+@keyframes levelupAppear {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.levelup-star { font-size: 80px; animation: starSpin 2s linear infinite; }
+@keyframes starSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.levelup-title {
+  font-family: var(--font-title);
+  font-size: 42px;
+  color: var(--gold);
+  text-shadow: 0 0 60px rgba(240,192,64,0.8);
+  margin: 16px 0 8px;
+}
+
+.levelup-level {
+  font-family: var(--font-ui);
+  font-size: 22px;
+  color: var(--parchment);
+  margin-bottom: 24px;
+}
+
+/* ═══ TABS ═══ */
+.tab-group {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 4px;
+}
+
+.tab-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  padding: 8px 16px;
+  color: var(--parchment-dark);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+}
+
+.tab-btn:hover, .tab-btn.active {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+  background: rgba(240,192,64,0.05);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 480px) {
+  .quiz-answers { grid-template-columns: 1fr; }
+  .duel-spells { grid-template-columns: repeat(2, 1fr); }
+  .map-grid { grid-template-columns: repeat(2, 1fr); }
+  .skills-grid { grid-template-columns: 1fr; }
+  .shop-items { grid-template-columns: 1fr; }
+  .avatar-grid { grid-template-columns: repeat(3, 1fr); }
+  .inv-grid { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SPLASH SCREEN -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="splash">
+  <div class="splash-stars"></div>
+  <div class="splash-castle">🏰</div>
+  <div class="splash-title">Poudlard Chronicles</div>
+  <div class="splash-subtitle">L'Éveil des Arcanes</div>
+  <button class="btn-magic" onclick="Game.startGame()">✨ Commencer l'Aventure</button>
+  <div class="splash-version">v1.0 — Un jeu de rôle magique</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CHARACTER CREATION -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="char-creation">
+  <div class="creation-panel">
+    <div class="panel-title">✨ Création du Personnage</div>
+    <div class="panel-subtitle">VOTRE DESTIN COMMENCE ICI</div>
+
+    <div class="form-group">
+      <label class="form-label">📜 Votre Nom de Sorcier</label>
+      <input type="text" class="form-input" id="char-name" placeholder="Ex: Ellara Sternwood..." maxlength="24">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🧙 Choisissez votre Avatar</label>
+      <div class="avatar-grid" id="avatar-grid">
+        <div class="avatar-option" onclick="selectAvatar(this,'🧙')" data-avatar="🧙">🧙</div>
+        <div class="avatar-option" onclick="selectAvatar(this,'🧙‍♀️')" data-avatar="🧙‍♀️">🧙‍♀️</div>
+        <div class="avatar-option" onclick="selectAvatar(this,'🧝')" data-avatar="🧝">🧝</div>
+        <div class="avatar-option" onclick="selectAvatar(this,'🧝‍♀️')" data-avatar="🧝‍♀️">🧝‍♀️</div>
+        <div class="avatar-option" onclick="selectAvatar(this,'🧑‍🎓')" data-avatar="🧑‍🎓">🧑‍🎓</div>
+        <div class="avatar-option" onclick="selectAvatar(this,'👨‍🎓')" data-avatar="👨‍🎓">👨‍🎓</div>
+        <div class="avatar-option" onclick="selectAvatar(this,'👩‍🎓')" data-avatar="👩‍🎓">👩‍🎓</div>
+        <div class="avatar-option" onclick="selectAvatar(this,'🧑‍🔬')" data-avatar="🧑‍🔬">🧑‍🔬</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🪄 Choisissez votre Baguette</label>
+      <div class="wand-grid">
+        <div class="wand-option" onclick="selectWand(this,'🪄','Bois de Chêne')" data-wand="🪄">
+          <span class="wand-icon">🪄</span>
+          <span class="wand-name">Chêne & Poil<br>de Dragon</span>
+        </div>
+        <div class="wand-option" onclick="selectWand(this,'⚡','Bouleau')" data-wand="⚡">
+          <span class="wand-icon">⚡</span>
+          <span class="wand-name">Bouleau &<br>Plume de Phénix</span>
+        </div>
+        <div class="wand-option" onclick="selectWand(this,'✨','Saule')" data-wand="✨">
+          <span class="wand-icon">✨</span>
+          <span class="wand-name">Saule &<br>Cheveu de Licorne</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🐾 Votre Familier</label>
+      <div class="avatar-grid">
+        <div class="avatar-option" onclick="selectPet(this,'🦉','Chouette')" data-pet="🦉">🦉<br><span style="font-size:10px;color:var(--parchment-dark)">Chouette</span></div>
+        <div class="avatar-option" onclick="selectPet(this,'🐱','Chat')" data-pet="🐱">🐱<br><span style="font-size:10px;color:var(--parchment-dark)">Chat</span></div>
+        <div class="avatar-option" onclick="selectPet(this,'🐸','Crapaud')" data-pet="🐸">🐸<br><span style="font-size:10px;color:var(--parchment-dark)">Crapaud</span></div>
+        <div class="avatar-option" onclick="selectPet(this,'🐍','Serpent')" data-pet="🐍">🐍<br><span style="font-size:10px;color:var(--parchment-dark)">Serpent</span></div>
+      </div>
+    </div>
+
+    <button class="btn-next" onclick="Game.goToSortingHat()">
+      🎩 Rencontrer le Choixpeau — Suivant
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SORTING HAT -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="sorting-hat">
+  <div class="hat-container">
+    <span class="hat-emoji">🎩</span>
+    <div class="hat-speech" id="hat-speech">
+      « Approche, jeune sorcier... Laisse-moi scruter les recoins de ton âme. Je saurai trouver la maison où tu t'épanouiras. »
+    </div>
+    <div id="quiz-container">
+      <div class="quiz-question" id="quiz-question"></div>
+      <div class="quiz-answers" id="quiz-answers"></div>
+    </div>
+    <div class="house-result" id="house-result">
+      <span class="house-badge" id="house-badge"></span>
+      <div class="house-name" id="house-name-display"></div>
+      <div class="house-motto" id="house-motto"></div>
+      <button class="btn-next" onclick="Game.finishCreation()" style="max-width:300px;margin:0 auto;">
+        🚀 Commencer à Poudlard
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- GAME HUD -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="hud">
+  <div class="hud-avatar" onclick="Game.openProfile()" id="hud-avatar">🧙</div>
+  <div class="hud-info">
+    <div class="hud-name" id="hud-name">Ellara Sternwood</div>
+    <div class="hud-bars">
+      <div class="hud-bar-row">
+        <span class="hud-bar-label bar-hp">❤️</span>
+        <div class="hud-bar"><div class="hud-bar-fill" id="hp-bar" style="width:100%"></div></div>
+        <span style="font-size:10px;color:var(--parchment-dark)" id="hp-text">100/100</span>
+      </div>
+      <div class="hud-bar-row">
+        <span class="hud-bar-label bar-mp">💙</span>
+        <div class="hud-bar"><div class="hud-bar-fill" id="mp-bar" style="width:100%"></div></div>
+        <span style="font-size:10px;color:var(--parchment-dark)" id="mp-text">80/80</span>
+      </div>
+      <div class="hud-bar-row">
+        <span class="hud-bar-label bar-xp">⭐</span>
+        <div class="hud-bar"><div class="hud-bar-fill" id="xp-bar" style="width:0%"></div></div>
+        <span style="font-size:10px;color:var(--parchment-dark)" id="xp-text">0/100</span>
+      </div>
+    </div>
+  </div>
+  <div class="hud-stats">
+    <div class="hud-stat">
+      <span class="hud-stat-val" id="hud-level">1</span>
+      <span class="hud-stat-lbl">NVX</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-stat-val" id="hud-galleons">💰 50</span>
+      <span class="hud-stat-lbl">GALLIONS</span>
+    </div>
+    <div class="hud-house-badge" id="hud-house">🦁</div>
+  </div>
+  <div>
+    <div class="hud-location" id="hud-location">POUDLARD</div>
+    <div class="hud-time" id="hud-time">☀️ 09:00</div>
+    <div class="hud-weather" id="hud-weather">☀️</div>
+  </div>
+</div>
+
+<!-- WORLD -->
+<div id="world">
+  <!-- PLAYER -->
+  <div id="player">
+    <span id="player-sprite">🧙</span>
+    <span class="player-name-tag" id="player-tag">Vous</span>
+  </div>
+
+  <!-- SCENE: HOGWARTS EXTERIOR -->
+  <div class="world-scene active" id="scene-hogwarts">
+    <div class="bg-hogwarts-sky"></div>
+    <div class="bg-stars"></div>
+    <div class="bg-castle">🏰</div>
+    <div class="bg-lake"></div>
+
+    <div class="scene-element" style="left:10%;top:58%" onclick="Game.interact('portal_platform')">
+      🚂<span class="scene-label">Quai 9¾</span>
+    </div>
+    <div class="scene-element" style="left:20%;top:65%" onclick="Game.openScene('great-hall')">
+      🏛️<span class="scene-label">Grande Salle</span>
+    </div>
+    <div class="scene-element" style="left:50%;top:70%" onclick="Game.openMap()">
+      🗺️<span class="scene-label">Carte</span>
+    </div>
+    <div class="scene-element" style="left:75%;top:62%" onclick="Game.openScene('library')">
+      📚<span class="scene-label">Bibliothèque</span>
+    </div>
+    <div class="scene-element" style="left:85%;top:70%" onclick="Game.openScene('dungeon')">
+      🧪<span class="scene-label">Cachots</span>
+    </div>
+
+    <!-- NPCs -->
+    <div class="npc" style="left:30%;top:60%" onclick="Game.talkToNPC('dumbledore')">
+      <span class="npc-sprite">🧙‍♂️</span>
+      <span class="npc-name">Dumbledore</span>
+    </div>
+    <div class="npc" style="left:60%;top:65%" onclick="Game.talkToNPC('hermione')">
+      <span class="npc-sprite">👩‍🎓</span>
+      <span class="npc-name">Hermione</span>
+    </div>
+    <div class="npc" style="left:70%;top:72%" onclick="Game.talkToNPC('ron')">
+      <span class="npc-sprite">👨‍🎓</span>
+      <span class="npc-name">Ron</span>
+    </div>
+    <div class="npc" style="left:15%;top:74%" onclick="Game.talkToNPC('hagrid')">
+      <span class="npc-sprite">🧔</span>
+      <span class="npc-name">Hagrid</span>
+    </div>
+    <div class="npc" style="left:45%;top:78%" onclick="Game.talkToNPC('snape')">
+      <span class="npc-sprite">🧛</span>
+      <span class="npc-name">Rogue</span>
+    </div>
+  </div>
+
+  <!-- SCENE: GREAT HALL -->
+  <div class="world-scene" id="scene-great-hall">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,#3a2010 0%,#1a0808 50%,#0a0414 100%)"></div>
+    <div style="position:absolute;top:5%;left:50%;transform:translateX(-50%);font-size:60px;filter:drop-shadow(0 0 30px rgba(240,192,64,0.5))">🕯️🕯️🕯️🕯️🕯️</div>
+    <div style="position:absolute;top:20%;left:50%;transform:translateX(-50%);font-family:var(--font-title);font-size:22px;color:var(--gold);text-shadow:var(--glow-gold);white-space:nowrap">✨ Grande Salle de Poudlard ✨</div>
+
+    <div class="scene-element" style="left:20%;top:40%" onclick="Game.startDuel()">
+      ⚔️<span class="scene-label">Duel</span>
+    </div>
+    <div class="scene-element" style="left:50%;top:40%" onclick="Game.openPotions()">
+      🧪<span class="scene-label">Potions</span>
+    </div>
+    <div class="scene-element" style="left:75%;top:40%" onclick="Game.openQuests()">
+      📜<span class="scene-label">Quêtes</span>
+    </div>
+    <div class="scene-element" style="left:35%;top:60%" onclick="Game.startQuidditch()">
+      🦅<span class="scene-label">Quidditch</span>
+    </div>
+    <div class="scene-element" style="left:65%;top:60%" onclick="Game.openShop()">
+      🏪<span class="scene-label">Boutique</span>
+    </div>
+
+    <div class="npc" style="left:20%;top:70%" onclick="Game.talkToNPC('mcgonagall')">
+      <span class="npc-sprite">👩‍🏫</span>
+      <span class="npc-name">McGonagall</span>
+    </div>
+    <div class="npc" style="left:55%;top:72%" onclick="Game.talkToNPC('neville')">
+      <span class="npc-sprite">🧑‍🌾</span>
+      <span class="npc-name">Neville</span>
+    </div>
+
+    <div class="scene-element" style="right:8%;top:30%;font-size:30px" onclick="Game.goBack()">
+      🚪<span class="scene-label">Retour</span>
+    </div>
+  </div>
+
+  <!-- SCENE: DIAGON ALLEY -->
+  <div class="world-scene" id="scene-diagon">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 110%,#0a1e0a 0%,#051005 50%,#020810 100%)"></div>
+    <div style="position:absolute;top:10%;left:50%;transform:translateX(-50%);font-family:var(--font-title);font-size:20px;color:#40cc40;text-shadow:0 0 20px rgba(64,204,64,0.5);white-space:nowrap">🏪 Chemin de Traverse 🏪</div>
+
+    <div class="scene-element" style="left:15%;top:40%" onclick="Game.openShopGringotts()">
+      🏦<span class="scene-label">Gringotts</span>
+    </div>
+    <div class="scene-element" style="left:35%;top:45%" onclick="Game.openShop()">
+      📚<span class="scene-label">Fleury & Bott</span>
+    </div>
+    <div class="scene-element" style="left:55%;top:40%" onclick="Game.openShopOllivander()">
+      🪄<span class="scene-label">Ollivander</span>
+    </div>
+    <div class="scene-element" style="left:75%;top:45%" onclick="Game.openShopZonon()">
+      🎭<span class="scene-label">Zonko</span>
+    </div>
+
+    <div class="npc" style="left:45%;top:65%" onclick="Game.talkToNPC('lupin')">
+      <span class="npc-sprite">🐺</span>
+      <span class="npc-name">Lupin</span>
+    </div>
+    <div class="npc" style="left:25%;top:72%" onclick="Game.talkToNPC('weasley_twins')">
+      <span class="npc-sprite">👨‍🦰</span>
+      <span class="npc-name">Fred & George</span>
+    </div>
+
+    <div class="scene-element" style="right:8%;top:30%;font-size:30px" onclick="Game.goBack()">
+      🚪<span class="scene-label">Retour</span>
+    </div>
+  </div>
+
+  <!-- SCENE: FORBIDDEN FOREST -->
+  <div class="world-scene" id="scene-forest">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#002200 0%,#001005 50%,#000810 100%)"></div>
+
+    <div style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:space-around;padding-bottom:5%">
+      <span style="font-size:100px;opacity:0.6">🌲</span>
+      <span style="font-size:120px;opacity:0.7">🌲</span>
+      <span style="font-size:80px;opacity:0.5">🌳</span>
+      <span style="font-size:110px;opacity:0.6">🌲</span>
+      <span style="font-size:90px;opacity:0.7">🌳</span>
+    </div>
+
+    <div style="position:absolute;top:10%;left:50%;transform:translateX(-50%);font-family:var(--font-title);font-size:18px;color:#00aa44;text-shadow:0 0 20px rgba(0,170,68,0.5);white-space:nowrap">🌲 Forêt Interdite 🌲</div>
+
+    <div class="scene-element" style="left:20%;top:50%" onclick="Game.huntCreature('centaure')">
+      🐴<span class="scene-label">Centaures</span>
+    </div>
+    <div class="scene-element" style="left:50%;top:45%" onclick="Game.huntCreature('licorne')">
+      🦄<span class="scene-label">Licorne</span>
+    </div>
+    <div class="scene-element" style="left:75%;top:52%" onclick="Game.huntCreature('araignee')">
+      🕷️<span class="scene-label">Aragog</span>
+    </div>
+    <div class="scene-element" style="left:38%;top:65%" onclick="Game.huntCreature('thestrals')">
+      🐉<span class="scene-label">Thestral</span>
+    </div>
+
+    <div class="npc" style="left:55%;top:65%" onclick="Game.talkToNPC('firenze')">
+      <span class="npc-sprite">🌟</span>
+      <span class="npc-name">Firenze</span>
+    </div>
+
+    <div class="scene-element" style="right:8%;top:30%;font-size:30px" onclick="Game.goBack()">
+      🚪<span class="scene-label">Retour</span>
+    </div>
+  </div>
+
+  <!-- SCENE: HOGSMEADE -->
+  <div class="world-scene" id="scene-hogsmeade">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 110%,#0a1020 0%,#050815 50%,#020510 100%)"></div>
+    <div style="position:absolute;top:10%;left:50%;transform:translateX(-50%);font-family:var(--font-title);font-size:20px;color:#88aaff;text-shadow:0 0 20px rgba(136,170,255,0.5);white-space:nowrap">🏘️ Pré-au-Lard 🏘️</div>
+
+    <div class="scene-element" style="left:15%;top:45%" onclick="Game.openShopHoneydukes()">
+      🍬<span class="scene-label">Honeydukes</span>
+    </div>
+    <div class="scene-element" style="left:40%;top:42%" onclick="Game.openShopHogHead()">
+      🍺<span class="scene-label">Tête de Cochon</span>
+    </div>
+    <div class="scene-element" style="left:65%;top:45%" onclick="Game.openShopThreeBroomsticks()">
+      🍻<span class="scene-label">3 Balais</span>
+    </div>
+    <div class="scene-element" style="left:50%;top:65%" onclick="Game.interact('azkaban_portal')">
+      🏚️<span class="scene-label">Hurlante</span>
+    </div>
+
+    <div class="npc" style="left:30%;top:68%" onclick="Game.talkToNPC('aberforth')">
+      <span class="npc-sprite">🧓</span>
+      <span class="npc-name">Abelforth</span>
+    </div>
+
+    <div class="scene-element" style="right:8%;top:30%;font-size:30px" onclick="Game.goBack()">
+      🚪<span class="scene-label">Retour</span>
+    </div>
+  </div>
+
+  <!-- SCENE: LIBRARY -->
+  <div class="world-scene" id="scene-library">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,#1a100a 0%,#0a0808 50%,#050414 100%)"></div>
+    <div style="position:absolute;top:10%;left:50%;transform:translateX(-50%);font-family:var(--font-title);font-size:18px;color:#c8a060;white-space:nowrap">📚 Bibliothèque de Poudlard</div>
+
+    <div class="scene-element" style="left:20%;top:40%" onclick="Game.readBook('histoire')">
+      📖<span class="scene-label">Histoire de la<br>Magie</span>
+    </div>
+    <div class="scene-element" style="left:45%;top:38%" onclick="Game.readBook('sortileges')">
+      ✨<span class="scene-label">Livre des<br>Sortilèges</span>
+    </div>
+    <div class="scene-element" style="left:68%;top:40%" onclick="Game.readBook('bestiaire')">
+      🐲<span class="scene-label">Bestiaire<br>Fantastique</span>
+    </div>
+    <div class="scene-element" style="left:35%;top:62%" onclick="Game.interact('restricted_section')">
+      ⛔<span class="scene-label">Section<br>Interdite</span>
+    </div>
+
+    <div class="npc" style="left:58%;top:65%" onclick="Game.talkToNPC('madam_pince')">
+      <span class="npc-sprite">👩‍💼</span>
+      <span class="npc-name">Mme Pince</span>
+    </div>
+
+    <div class="scene-element" style="right:8%;top:30%;font-size:30px" onclick="Game.goBack()">
+      🚪<span class="scene-label">Retour</span>
+    </div>
+  </div>
+
+  <!-- SCENE: DUNGEON (Potions) -->
+  <div class="world-scene" id="scene-dungeon">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,#001510 0%,#000805 50%,#050414 100%)"></div>
+    <div style="position:absolute;top:10%;left:50%;transform:translateX(-50%);font-family:var(--font-title);font-size:18px;color:#00cc66;white-space:nowrap">🧪 Cachots — Cours de Potions</div>
+
+    <div class="scene-element" style="left:20%;top:45%" onclick="Game.openPotions()">
+      ⚗️<span class="scene-label">Préparer<br>une Potion</span>
+    </div>
+    <div class="scene-element" style="left:50%;top:42%" onclick="Game.openShopPotionIngredients()">
+      🌿<span class="scene-label">Ingrédients</span>
+    </div>
+    <div class="scene-element" style="left:75%;top:45%" onclick="Game.interact('cauldron_lesson')">
+      🧫<span class="scene-label">Cours</span>
+    </div>
+
+    <div class="npc" style="left:38%;top:68%" onclick="Game.talkToNPC('snape')">
+      <span class="npc-sprite">🧛</span>
+      <span class="npc-name">Rogue</span>
+    </div>
+
+    <div class="scene-element" style="right:8%;top:30%;font-size:30px" onclick="Game.goBack()">
+      🚪<span class="scene-label">Retour</span>
+    </div>
+  </div>
+</div>
+
+<!-- DAY/NIGHT OVERLAY -->
+<div id="daynight"></div>
+<div id="weather-overlay"></div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- BOTTOM NAV -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="bottom-nav">
+  <button class="nav-btn active" onclick="Game.showWorld()" id="nav-world">
+    <span class="nav-btn-icon">🗺️</span>
+    <span class="nav-btn-label">Monde</span>
+  </button>
+  <button class="nav-btn" onclick="Game.openInventory()">
+    <span class="nav-btn-icon">🎒</span>
+    <span class="nav-btn-label">Sac</span>
+  </button>
+  <button class="nav-btn" onclick="Game.openSkills()">
+    <span class="nav-btn-icon">⭐</span>
+    <span class="nav-btn-label">Compétences</span>
+  </button>
+  <button class="nav-btn" onclick="Game.openQuests()">
+    <span class="nav-btn-icon">📜</span>
+    <span class="nav-btn-label">Quêtes</span>
+  </button>
+  <button class="nav-btn" onclick="Game.openProfile()">
+    <span class="nav-btn-icon">👤</span>
+    <span class="nav-btn-label">Profil</span>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- MINIMAP -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="minimap">
+  <div class="minimap-title">⚡ Carte ⚡</div>
+  <div class="minimap-canvas" id="minimap-canvas">
+    <div class="minimap-zone" style="left:5%;top:5%;width:25%;height:35%;background:rgba(100,50,200,0.15);border:1px solid rgba(100,50,200,0.3)" onclick="Game.openMap()">🏰</div>
+    <div class="minimap-zone" style="left:35%;top:60%;width:25%;height:30%;background:rgba(50,150,50,0.15);border:1px solid rgba(50,150,50,0.3)" onclick="Game.openScene('forest')">🌲</div>
+    <div class="minimap-zone" style="left:65%;top:10%;width:30%;height:30%;background:rgba(50,100,200,0.15);border:1px solid rgba(50,100,200,0.3)" onclick="Game.openScene('hogsmeade')">🏘️</div>
+    <div class="minimap-dot" id="minimap-player" style="left:15%;top:20%"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- DIALOGUE BOX -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="dialogue-box">
+  <div class="dialogue-speaker" id="dialogue-speaker">🧙‍♂️ DUMBLEDORE</div>
+  <div class="dialogue-text" id="dialogue-text"></div>
+  <div id="dialogue-choices" class="dialogue-choices"></div>
+  <div class="dialogue-continue" id="dialogue-continue" onclick="Game.nextDialogue()">Continuer ▼</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- NOTIFICATIONS -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="notifications"></div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- OVERLAY PANELS -->
+<!-- ═══════════════════════════════════════════ -->
+
+<!-- INVENTORY PANEL -->
+<div class="panel-overlay" id="panel-inventory">
+  <div class="panel-box">
+    <div class="panel-header">
+      <div class="panel-header-title">🎒 Inventaire</div>
+      <button class="panel-close" onclick="Game.closePanel('inventory')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="inv-gold">
+        <div class="inv-currency">🥇 <span id="inv-galleons">50</span> Gallions</div>
+        <div class="inv-currency">🥈 <span id="inv-mornilles">10</span> Mornilles</div>
+        <div class="inv-currency">🥉 <span id="inv-noises">5</span> Noises</div>
+      </div>
+      <div class="inv-grid" id="inventory-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SKILLS PANEL -->
+<div class="panel-overlay" id="panel-skills">
+  <div class="panel-box">
+    <div class="panel-header">
+      <div class="panel-header-title">⭐ Compétences</div>
+      <button class="panel-close" onclick="Game.closePanel('skills')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div style="margin-bottom:12px;font-family:var(--font-ui);font-size:11px;color:var(--parchment-dark);letter-spacing:2px">ANNÉE <span id="skill-year">1</span> — NIVEAU <span id="skill-level-display">1</span></div>
+      <div class="skills-grid" id="skills-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTS PANEL -->
+<div class="panel-overlay" id="panel-quests">
+  <div class="panel-box">
+    <div class="panel-header">
+      <div class="panel-header-title">📜 Journal de Quêtes</div>
+      <button class="panel-close" onclick="Game.closePanel('quests')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="tab-group">
+        <button class="tab-btn active" onclick="switchTab('quests','active')">Actives</button>
+        <button class="tab-btn" onclick="switchTab('quests','completed')">Terminées</button>
+      </div>
+      <div class="tab-content active" id="tab-quests-active">
+        <div id="quests-list"></div>
+      </div>
+      <div class="tab-content" id="tab-quests-completed">
+        <div id="quests-done-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SHOP PANEL -->
+<div class="panel-overlay" id="panel-shop">
+  <div class="panel-box">
+    <div class="panel-header">
+      <div class="panel-header-title" id="shop-title">🏪 Boutique</div>
+      <button class="panel-close" onclick="Game.closePanel('shop')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div style="margin-bottom:12px;font-family:var(--font-ui);font-size:11px;color:var(--gold)">💰 Gallions: <span id="shop-galleons">50</span></div>
+      <div class="shop-items" id="shop-items-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DUEL SCREEN -->
+<div id="duel-screen">
+  <div class="duel-header">
+    <div class="duel-combatant">
+      <div class="duel-name" id="duel-player-name">VOUS</div>
+      <div class="duel-hp-bar"><div class="duel-hp-fill player-hp" id="duel-player-hp" style="width:100%"></div></div>
+      <div style="font-size:10px;font-family:var(--font-ui);color:var(--parchment-dark);margin-top:4px" id="duel-player-hp-text">100/100</div>
+    </div>
+    <div class="duel-vs">⚔️</div>
+    <div class="duel-combatant">
+      <div class="duel-name" id="duel-enemy-name">ENNEMI</div>
+      <div class="duel-hp-bar"><div class="duel-hp-fill enemy-hp" id="duel-enemy-hp" style="width:100%"></div></div>
+      <div style="font-size:10px;font-family:var(--font-ui);color:var(--parchment-dark);margin-top:4px" id="duel-enemy-hp-text">80/80</div>
+    </div>
+  </div>
+
+  <div class="duel-arena">
+    <span class="duel-figure" id="duel-player-fig">🧙</span>
+    <div class="duel-beam" id="duel-beam"></div>
+    <span class="duel-figure enemy" id="duel-enemy-fig">🧛</span>
+  </div>
+
+  <div class="duel-log" id="duel-log"></div>
+
+  <div class="duel-spells" id="duel-spells"></div>
+</div>
+
+<!-- POTION MINI-GAME -->
+<div id="potion-game">
+  <div class="potion-cauldron">🧪</div>
+  <div style="font-family:var(--font-title);font-size:22px;color:#00cc66;margin-bottom:8px">Cours de Potions</div>
+  <div class="potion-recipe" id="potion-recipe">
+    <div class="potion-recipe-title">POTION À PRÉPARER</div>
+    <div id="potion-recipe-name" style="font-size:15px;color:var(--parchment);margin-bottom:10px"></div>
+    <div class="potion-ingredients" id="potion-required"></div>
+  </div>
+  <div style="font-family:var(--font-ui);font-size:11px;color:rgba(0,200,100,0.6);margin-bottom:8px;letter-spacing:2px">INGRÉDIENTS DISPONIBLES</div>
+  <div class="potion-slots" id="potion-slots"></div>
+  <div style="display:flex;gap:12px;margin-top:8px">
+    <button class="potion-btn" onclick="Game.brewPotion()">⚗️ Préparer la Potion</button>
+    <button class="potion-btn" style="background:linear-gradient(135deg,#440000,#880000);border-color:#cc2222" onclick="Game.closePotions()">✕ Fermer</button>
+  </div>
+  <div id="potion-result" style="margin-top:12px;font-size:14px;font-style:italic;color:var(--parchment);text-align:center;min-height:20px"></div>
+</div>
+
+<!-- MAP SCREEN -->
+<div id="map-screen">
+  <div style="font-family:var(--font-title);font-size:24px;color:var(--gold);margin-bottom:20px;text-shadow:var(--glow-gold)">🗺️ Monde Magique</div>
+  <div class="map-grid" id="map-grid"></div>
+  <button class="btn-next" style="max-width:200px;margin-top:16px" onclick="Game.closeMap()">✕ Fermer</button>
+</div>
+
+<!-- QUIDDITCH SCREEN -->
+<div id="quidditch-screen">
+  <div class="quidditch-title">🦅 Quidditch</div>
+  <div class="quidditch-score" id="quidditch-score">0 — 0</div>
+  <div class="quidditch-timer" id="quidditch-timer">⏱️ 120s</div>
+  <div class="quidditch-field" id="quidditch-field">
+    <span class="quidditch-player" id="q-player" style="left:45%;top:45%;font-size:28px">🧙</span>
+    <span class="quidditch-snitch" id="q-snitch" style="left:70%;top:20%">✨</span>
+    <span style="position:absolute;left:10%;top:40%;font-size:20px;opacity:0.4">🎯</span>
+    <span style="position:absolute;right:10%;top:40%;font-size:20px;opacity:0.4">🎯</span>
+    <span class="quidditch-player" style="left:20%;top:30%;font-size:22px;pointer-events:none;animation:snitchFly 4s ease-in-out infinite">🧛</span>
+    <span class="quidditch-player" style="right:20%;top:60%;font-size:22px;pointer-events:none;animation:snitchFly 3s ease-in-out infinite reverse">🧛</span>
+  </div>
+  <div class="quidditch-controls">
+    <button class="q-btn" onclick="Game.quidditchAction('left')">◄ Gauche</button>
+    <button class="q-btn" onclick="Game.quidditchAction('right')">Droite ►</button>
+    <button class="q-btn" onclick="Game.quidditchAction('up')">▲ Haut</button>
+    <button class="q-btn" onclick="Game.quidditchAction('down')">▼ Bas</button>
+  </div>
+  <div id="quidditch-msg" style="margin-top:8px;font-size:13px;font-style:italic;color:var(--gold);text-align:center"></div>
+  <button class="btn-next" style="max-width:200px;margin-top:8px" onclick="Game.closeQuidditch()">✕ Quitter</button>
+</div>
+
+<!-- PROFILE SCREEN -->
+<div id="profile-screen">
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar-big" id="profile-avatar-display">🧙</div>
+      <div>
+        <div class="profile-name" id="profile-name">Ellara Sternwood</div>
+        <div class="profile-house" id="profile-house">🦁 Gryffondor — 1ère Année</div>
+        <div class="profile-year" id="profile-wand">🪄 Baguette en Chêne</div>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><span class="stat-box-val" id="prof-level">1</span><span class="stat-box-lbl">Niveau</span></div>
+      <div class="stat-box"><span class="stat-box-val" id="prof-xp">0</span><span class="stat-box-lbl">XP Total</span></div>
+      <div class="stat-box"><span class="stat-box-val" id="prof-gold">50</span><span class="stat-box-lbl">Gallions</span></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><span class="stat-box-val" id="prof-quests">0</span><span class="stat-box-lbl">Quêtes</span></div>
+      <div class="stat-box"><span class="stat-box-val" id="prof-duels">0</span><span class="stat-box-lbl">Duels</span></div>
+      <div class="stat-box"><span class="stat-box-val" id="prof-potions">0</span><span class="stat-box-lbl">Potions</span></div>
+    </div>
+    <div style="font-family:var(--font-ui);font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:10px">RELATIONS</div>
+    <div class="npc-relations" id="profile-relations"></div>
+  </div>
+  <button class="btn-next" style="max-width:200px" onclick="Game.closeProfile()">✕ Fermer</button>
+</div>
+
+<!-- LEVEL UP SCREEN -->
+<div id="levelup-screen">
+  <div class="levelup-container">
+    <span class="levelup-star">⭐</span>
+    <div class="levelup-title">Niveau Supérieur!</div>
+    <div class="levelup-level" id="levelup-text">Vous avez atteint le niveau 2!</div>
+    <div style="font-size:13px;color:var(--parchment-dark);font-style:italic;margin-bottom:24px" id="levelup-bonus">+10 HP Max, +5 MP Max</div>
+    <button class="btn-magic" onclick="Game.closeLevelUp()">✨ Continuer</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  POUDLARD CHRONICLES — COMPLETE GAME ENGINE
+// ═══════════════════════════════════════════════════
+
+// ─── STATE ───────────────────────────────────────
+const STATE = {
+  player: {
+    name: 'Voyageur Magique',
+    avatar: '🧙',
+    wand: '🪄',
+    wandName: 'Bois de Chêne',
+    pet: '🦉',
+    petName: 'Chouette',
+    house: 'gryffondor',
+    level: 1,
+    year: 1,
+    xp: 0,
+    xpNext: 100,
+    xpTotal: 0,
+    hp: 100,
+    hpMax: 100,
+    mp: 80,
+    mpMax: 80,
+    galleons: 50,
+    mornilles: 10,
+    noises: 5,
+    skills: {
+      sortileges: 0,
+      potions: 0,
+      duel: 0,
+      botanique: 0,
+      vol: 0,
+      defense: 0
+    },
+    inventory: [],
+    quests: [],
+    questsDone: [],
+    relations: {
+      dumbledore: 50, hermione: 40, ron: 45, hagrid: 35,
+      snape: 10, mcgonagall: 40, neville: 50, lupin: 45,
+      weasley_twins: 55, firenze: 30, madam_pince: 25, aberforth: 20
+    },
+    stats: { duels: 0, potions: 0, quests: 0 }
+  },
+  world: {
+    scene: 'hogwarts',
+    prevScene: null,
+    time: 9 * 60, // minutes
+    weather: 'clear',
+    weatherTimer: 0
+  },
+  game: { started: false, sortingDone: false },
+  duel: { active: false, enemy: null, playerHp: 100, enemyHp: 80 },
+  potion: { active: false, recipe: null, added: [] },
+  quidditch: { score: [0,0], timer: 120, interval: null, playerX: 45, playerY: 45 }
+};
+
+// ─── HOUSE DATA ──────────────────────────────────
+const HOUSES = {
+  gryffondor: {
+    name: 'Gryffondor', badge: '🦁', color: '#cc2222',
+    motto: '« La bravoure, la loyauté, la noblesse de cœur »',
+    scores: {courage:0, loyalty:0, intelligence:0, cunning:0}
+  },
+  serdaigle: {
+    name: 'Serdaigle', badge: '🦅', color: '#2244cc',
+    motto: '« La sagesse, l\'intelligence, la créativité »',
+    scores: {courage:0, loyalty:0, intelligence:0, cunning:0}
+  },
+  poufsouffle: {
+    name: 'Poufsouffle', badge: '🦡', color: '#cc8800',
+    motto: '« La loyauté, la patience, le travail acharné »',
+    scores: {courage:0, loyalty:0, intelligence:0, cunning:0}
+  },
+  serpentard: {
+    name: 'Serpentard', badge: '🐍', color: '#226622',
+    motto: '« L\'ambition, la ruse, la ténacité »',
+    scores: {courage:0, loyalty:0, intelligence:0, cunning:0}
+  }
+};
+
+// ─── SORTING HAT QUESTIONS ───────────────────────
+const SORTING_QUESTIONS = [
+  {
+    text: "Face à un monstre qui garde un trésor, vous...",
+    answers: [
+      { text: "Vous ruez sur lui, baguette en main!", trait: 'courage' },
+      { text: "Étudiez ses faiblesses depuis un livre avant d'agir.", trait: 'intelligence' },
+      { text: "Cherchez une ruse pour le distraire et passer.", trait: 'cunning' },
+      { text: "Demandez l'aide de vos amis pour l'affronter ensemble.", trait: 'loyalty' }
+    ]
+  },
+  {
+    text: "Quel cours vous attire le plus?",
+    answers: [
+      { text: "Défense contre les forces du Mal — pour protéger.", trait: 'courage' },
+      { text: "Sortilèges et transformations — pour apprendre.", trait: 'intelligence' },
+      { text: "Potions et Herbologie — pour maîtriser.", trait: 'cunning' },
+      { text: "Soins aux créatures magiques — pour s'en occuper.", trait: 'loyalty' }
+    ]
+  },
+  {
+    text: "Un ami vous demande de tricher pour lui sauver la mise...",
+    answers: [
+      { text: "Refusez net — l'honneur avant tout!", trait: 'courage' },
+      { text: "Analysez les risques et trouvez une alternative légale.", trait: 'intelligence' },
+      { text: "Trouvez un moyen de l'aider sans vous compromettre.", trait: 'cunning' },
+      { text: "Aidez-le — vos amis comptent plus que les règles.", trait: 'loyalty' }
+    ]
+  },
+  {
+    text: "Votre plus grande qualité est...",
+    answers: [
+      { text: "Mon courage face à l'adversité.", trait: 'courage' },
+      { text: "Mon intelligence et ma soif d'apprendre.", trait: 'intelligence' },
+      { text: "Mon ambition et ma détermination.", trait: 'cunning' },
+      { text: "Ma loyauté envers ceux que j'aime.", trait: 'loyalty' }
+    ]
+  }
+];
+
+// ─── NPC DATA ─────────────────────────────────────
+const NPCS = {
+  dumbledore: {
+    name: 'Albus Dumbledore', icon: '🧙‍♂️',
+    dialogues: [
+      {
+        text: "Il est de ces moments, jeune(e) %s, où l'obscurité semble insurmontable. Mais souvenez-vous : c'est l'amour qui distingue un sorcier d'un ennemi des ténèbres.",
+        choices: [
+          { text: "Parlez-moi de l'Éveil des Arcanes.", next: 'quest_main' },
+          { text: "J'ai besoin de vos conseils.", next: 'advice' },
+          { text: "Merci, Professeur.", next: null, xp: 10 }
+        ]
+      },
+      {
+        id: 'quest_main',
+        text: "Ah, vous avez senti le trouble... Il y a une semaine, un artefact ancien a disparu des voûtes de Poudlard. La Pierre des Arcanes — une relique qui peut altérer le tissu même de la réalité magique. Retrouvez-la avant qu'il ne soit trop tard.",
+        choices: [
+          { text: "J'accepte cette mission!", next: null, questStart: 'main_artefact', xp: 50 },
+          { text: "C'est dangereux...", next: null, xp: 5 }
+        ]
+      },
+      {
+        id: 'advice',
+        text: "La magie n'est pas seulement dans les sortilèges, mais dans l'intention. Pratiquez vos compétences, parlez aux autres, explorez chaque recoin du château.",
+        choices: [{ text: "Merci pour ces sages paroles.", next: null, xp: 15 }]
+      }
+    ]
+  },
+  hermione: {
+    name: 'Hermione Granger', icon: '👩‍🎓',
+    dialogues: [
+      {
+        text: "Oh, tu arrives à pic! J'ai trouvé quelque chose d'étrange dans la section restreinte. Un passage sur les Arcanes Primaux... Tu devrais aller y jeter un œil.",
+        choices: [
+          { text: "On cherche ensemble?", next: 'study', xp: 20, relation: 10 },
+          { text: "Je t'apporterai mes notes.", next: null, xp: 10 }
+        ]
+      },
+      {
+        id: 'study',
+        text: "Super ! On commence par les sortilèges de révélation — 'Aparecium' pour révéler l'invisible. Pratique ça, ça nous sera utile !",
+        choices: [{ text: "D'accord!", next: null, xp: 25, skillXp: { sortileges: 15 }, questStart: 'side_study' }]
+      }
+    ]
+  },
+  ron: {
+    name: 'Ron Weasley', icon: '👨‍🎓',
+    dialogues: [
+      {
+        text: "Hé ! Tu veux faire une partie de Quidditch? J'ai emprunté les balais de l'équipe de Gryffondor. On pourrait s'entraîner au terrain.",
+        choices: [
+          { text: "Carrément, on y va!", next: null, action: 'quidditch', relation: 10 },
+          { text: "Pas maintenant, désolé(e).", next: null }
+        ]
+      }
+    ]
+  },
+  hagrid: {
+    name: 'Rubeus Hagrid', icon: '🧔',
+    dialogues: [
+      {
+        text: "Ah, te v'là ! J'ai besoin d'aide pour m'occuper des Hippogriffes. Fang a aussi vu quelque chose d'étrange dans la forêt la nuit dernière. Un rôdeur, il dit...",
+        choices: [
+          { text: "J'irai enquêter dans la forêt!", next: null, questStart: 'side_forest', xp: 30, relation: 15 },
+          { text: "Des Hippogriffes? Je peux aider!", next: null, xp: 20, skillXp: { botanique: 10 } }
+        ]
+      }
+    ]
+  },
+  snape: {
+    name: 'Severus Rogue', icon: '🧛',
+    dialogues: [
+      {
+        text: "Tiens, tiens... encore vous. Vous flânez dans les couloirs alors que vos devoirs de Potions semblent lamentablement inachevés. Préparez-moi une Potion de Force avant ce soir.",
+        choices: [
+          { text: "Oui, Professeur.", next: null, questStart: 'side_potion', xp: 10 },
+          { text: "Et si je refuse?", next: 'refuse' }
+        ]
+      },
+      {
+        id: 'refuse',
+        text: "Cinquante points en moins pour votre maison. Maintenant dégagez de mon couloir.",
+        choices: [{ text: "...", next: null, xp: -5 }]
+      }
+    ]
+  },
+  mcgonagall: {
+    name: 'Minerva McGonagall', icon: '👩‍🏫',
+    dialogues: [
+      {
+        text: "Ah, parfait! Les examens de fin d'année approchent. Je vous conseille de réviser les Métamorphoses de base. Passez me voir à mon bureau si vous avez besoin d'aide.",
+        choices: [
+          { text: "J'étudierai dur!", next: null, xp: 20 },
+          { text: "Pouvez-vous m'aider maintenant?", next: 'help', skillXp: { sortileges: 20 } }
+        ]
+      },
+      {
+        id: 'help',
+        text: "Bien sûr. Voici les bases : Transformation transfigure un objet en un autre. Visualisez clairement votre cible, concentrez votre intention, puis prononcez l'incantation avec précision.",
+        choices: [{ text: "Merci Professeur!", next: null, xp: 30, relation: 10 }]
+      }
+    ]
+  },
+  neville: {
+    name: 'Neville Londubat', icon: '🧑‍🌾',
+    dialogues: [
+      {
+        text: "Oh, salut! Tu tombes bien... Mamie Longbottom m'a envoyé des graines de Mandragore extrêmement rares. Tu pourrais m'aider à les planter? La Botanique c'est pas vraiment mon fort...",
+        choices: [
+          { text: "Bien sûr, j'adore la Botanique!", next: null, xp: 25, skillXp: { botanique: 20 }, relation: 15 },
+          { text: "Tu es sûr? Tu es en cours de Botanique...", next: null, xp: 5 }
+        ]
+      }
+    ]
+  },
+  lupin: {
+    name: 'Remus Lupin', icon: '🐺',
+    dialogues: [
+      {
+        text: "Bonsoir. Je suis en train d'enseigner des sorts de protection avancés à quelques élèves. Voulez-vous rejoindre notre groupe de pratique ? C'est important dans les temps qui courent...",
+        choices: [
+          { text: "Je serais honoré(e)!", next: null, xp: 40, skillXp: { defense: 25 }, relation: 20 },
+          { text: "Peut-être plus tard.", next: null }
+        ]
+      }
+    ]
+  },
+  weasley_twins: {
+    name: 'Fred & George Weasley', icon: '👨‍🦰',
+    dialogues: [
+      {
+        text: "Psst ! Tu veux des bonbons Bertie Crochue ? On a aussi des Dragées Surprises et quelques inventions maison... Dis-nous juste pas à maman !",
+        choices: [
+          { text: "J'achète des bonbons! (5 Gallions)", next: null, buy: { item: '🍬', name: 'Bonbons Bertie', price: 5 } },
+          { text: "Une invention magique? (20 Gallions)", next: null, buy: { item: '💥', name: 'Boîte à Surprises', price: 20 } },
+          { text: "Non merci!", next: null }
+        ]
+      }
+    ]
+  },
+  firenze: {
+    name: 'Firenze', icon: '🌟',
+    dialogues: [
+      {
+        text: "Les étoiles parlent, humain. Mars brille d'une lumière étrange cette semaine — un danger ancien se réveille dans les eaux du lac noir. Méfie-toi de ceux qui portent un masque d'amitié.",
+        choices: [
+          { text: "Que puis-je faire?", next: 'prophecy', xp: 20 },
+          { text: "Je comprends. Merci.", next: null, xp: 10 }
+        ]
+      },
+      {
+        id: 'prophecy',
+        text: "Cherche la Pierre là où deux mondes se touchent : entre l'eau et la pierre, entre la lumière et l'ombre. Seul celui qui comprend les deux can la saisir.",
+        choices: [{ text: "Je comprends. Je cherchais cette réponse.", next: null, xp: 50, questStep: 'main_artefact' }]
+      }
+    ]
+  },
+  madam_pince: {
+    name: 'Mme Pince', icon: '👩‍💼',
+    dialogues: [
+      {
+        text: "CHUT! On est dans une bibliothèque! Si vous cherchez un livre, utilisez le catalogue. Et ne touchez PAS aux livres de la section restreinte sans autorisation signée.",
+        choices: [
+          { text: "Désolé(e). Avez-vous un livre sur les Arcanes?", next: 'arcane', xp: 5 },
+          { text: "Pardon, je cherchais juste...", next: null }
+        ]
+      },
+      {
+        id: 'arcane',
+        text: "Les Arcanes Primaux? C'est dans la section restreinte. Vous aurez besoin d'une autorisation du Directeur. Ces connaissances ne sont pas pour les imprudents.",
+        choices: [{ text: "J'obtiendrai cette autorisation!", next: null, xp: 15, questStep: 'find_book' }]
+      }
+    ]
+  },
+  aberforth: {
+    name: 'Abelforth Dumbledore', icon: '🧓',
+    dialogues: [
+      {
+        text: "Vous ressemblez à quelqu'un qui cherche des réponses... Mon frère vous a envoyé, pas vrai? Il y a une chose qu'il ne vous a pas dite : la Pierre des Arcanes a déjà été activée une fois. En 1945.",
+        choices: [
+          { text: "Que s'est-il passé?", next: 'history', xp: 30 },
+          { text: "Qui l'a activée?", next: 'who', xp: 20 }
+        ]
+      },
+      {
+        id: 'history',
+        text: "Un ancien sorcier nommé Malachai Vorn voulait effacer la frontière entre le monde des vivants et celui des morts. Il a échoué — mais la Pierre a gardé une parcelle de sa magie corrompue.",
+        choices: [{ text: "Et maintenant elle est libre...", next: null, xp: 40, questStep: 'history_revealed' }]
+      },
+      {
+        id: 'who',
+        text: "Gellert Grindelwald. Oui, ce même Grindelwald. Et avant de partir, il a caché la Pierre ici, à Poudlard. Elle était censée dormir pour toujours...",
+        choices: [{ text: "Merci pour cette information cruciale.", next: null, xp: 35 }]
+      }
+    ]
+  }
+};
+
+// ─── QUESTS DATA ──────────────────────────────────
+const QUESTS_DATA = {
+  main_artefact: {
+    name: "L'Éveil des Arcanes",
+    type: 'main',
+    desc: "La Pierre des Arcanes a disparu des voûtes de Poudlard. Retrouvez-la avant qu'elle ne tombe entre de mauvaises mains.",
+    steps: ["Parler à Firenze dans la forêt", "Trouver le livre à la bibliothèque", "Révéler l'histoire avec Abelforth"],
+    rewards: { xp: 200, galleons: 100, item: { icon: '💎', name: 'Fragment des Arcanes' } }
+  },
+  side_study: {
+    name: "Session d'Étude avec Hermione",
+    type: 'side',
+    desc: "Pratiquer les sortilèges de révélation avec Hermione Granger.",
+    steps: ["Apprendre Aparecium"],
+    rewards: { xp: 50, skillXp: { sortileges: 30 } }
+  },
+  side_forest: {
+    name: "Mystère dans la Forêt Interdite",
+    type: 'side',
+    desc: "Fang a aperçu quelque chose d'étrange dans la forêt. Allez enquêter.",
+    steps: ["Explorer la forêt interdite"],
+    rewards: { xp: 75, galleons: 25 }
+  },
+  side_potion: {
+    name: "La Potion du Professeur Rogue",
+    type: 'side',
+    desc: "Préparer une Potion de Force pour Rogue avant ce soir.",
+    steps: ["Préparer la Potion de Force"],
+    rewards: { xp: 60, relation: { snape: 15 } }
+  }
+};
+
+// ─── ITEMS DATA ───────────────────────────────────
+const ITEMS = {
+  potion_soin: { icon: '❤️', name: 'Potion de Soin', desc: '+30 HP', price: 15, effect: () => { healPlayer(30); } },
+  potion_mana: { icon: '💙', name: 'Potion de Mana', desc: '+20 MP', price: 12, effect: () => { restoreMP(20); } },
+  livre_sorts: { icon: '📚', name: 'Livre de Sorts', desc: '+20 XP Sort', price: 25, effect: () => { gainSkillXP('sortileges', 20); } },
+  parchemin: { icon: '📜', name: 'Parchemin Vierge', desc: 'Utile pour les quêtes', price: 5 },
+  bonbon: { icon: '🍬', name: 'Bonbons Bertie', desc: 'Effet aléatoire... Surprenant!', price: 5, effect: () => { randomCandyEffect(); } },
+  baguette_plus: { icon: '🪄', name: 'Baguette Améliorée', desc: '+5 à tous les sorts', price: 80 },
+  chapeau_magie: { icon: '🎩', name: 'Chapeau Magique', desc: 'Style + mystère', price: 30 },
+  lunettes: { icon: '👓', name: 'Lunettes de Vision', desc: 'Révèle les objets cachés', price: 45 },
+  cape: { icon: '🧣', name: 'Cape de Voyage', desc: '+10 défense', price: 60 },
+  gemme: { icon: '💎', name: 'Gemme Magique', desc: 'Objet rare de quête', price: 200 },
+  herb_venomeux: { icon: '🌿', name: 'Herbe Vénéneuse', desc: 'Ingrédient rare', price: 20 },
+  pierre_lune: { icon: '🌙', name: 'Pierre de Lune', desc: 'Ingrédient magique', price: 35 },
+  ecaille_dragon: { icon: '🐉', name: 'Écaille de Dragon', desc: 'Très rare', price: 100 },
+  plume_phoenix: { icon: '🔥', name: 'Plume de Phénix', desc: 'Ingrédient légendaire', price: 150 }
+};
+
+// ─── SHOPS DATA ───────────────────────────────────
+const SHOPS = {
+  default: { title: '🏪 Boutique Magique', items: ['potion_soin','potion_mana','livre_sorts','parchemin','bonbon'] },
+  gringotts: { title: '🏦 Gringotts — Change', items: ['gemme','baguette_plus','lunettes'] },
+  ollivander: { title: '🪄 Ollivander — Baguettes', items: ['baguette_plus','plume_phoenix','chapeau_magie'] },
+  zonon: { title: '🎭 Zonko — Farces & Attrapes', items: ['bonbon','cape','parchemin'] },
+  honeydukes: { title: '🍬 Honeydukes — Sucreries', items: ['bonbon','potion_soin'] },
+  hoghead: { title: '🍺 Tête de Cochon — Taverne', items: ['potion_mana','parchemin'] },
+  threebroomsticks: { title: '🍻 3 Balais — Auberge', items: ['potion_soin','potion_mana','parchemin'] },
+  potion_ingredients: { title: '🌿 Ingrédients pour Potions', items: ['herb_venomeux','pierre_lune','ecaille_dragon','plume_phoenix'] }
+};
+
+// ─── SPELLS DATA ──────────────────────────────────
+const SPELLS = [
+  { icon: '⚡', name: 'Expelliarmus', mp: 10, dmg: [15,25], type: 'normal', desc: 'Désarme l\'adversaire' },
+  { icon: '🌟', name: 'Stupefix', mp: 20, dmg: [25,40], type: 'stun', desc: 'Étourdit brièvement' },
+  { icon: '🔥', name: 'Incendio', mp: 15, dmg: [20,35], type: 'fire', desc: 'Projectile enflammé' },
+  { icon: '❄️', name: 'Glacius', mp: 12, dmg: [18,28], type: 'ice', desc: 'Ralentit l\'adversaire' },
+  { icon: '💚', name: 'Episkey', mp: 25, dmg: [-30,-20], type: 'heal', desc: 'Vous soigne vous-même' },
+  { icon: '🌀', name: 'Confundo', mp: 18, dmg: [10,15], type: 'confuse', desc: 'Confond l\'adversaire' },
+  { icon: '⚫', name: 'Obscuro', mp: 22, dmg: [30,45], type: 'dark', desc: 'Sort des ténèbres' },
+  { icon: '✨', name: 'Lumos Max', mp: 30, dmg: [35,55], type: 'light', desc: 'Lumière aveuglante' }
+];
+
+// ─── ENEMIES DATA ────────────────────────────────
+const ENEMIES = [
+  { name: 'Elève Serpentard', icon: '🐍', hp: 60, maxHp: 60, dmg: [10,20], xp: 40 },
+  { name: 'Cornafelin', icon: '🐾', hp: 80, maxHp: 80, dmg: [15,25], xp: 55 },
+  { name: 'Fantôme', icon: '👻', hp: 50, maxHp: 50, dmg: [8,18], xp: 35 },
+  { name: 'Troll', icon: '👹', hp: 120, maxHp: 120, dmg: [20,35], xp: 80 },
+  { name: 'Basilic Mineur', icon: '🐲', hp: 150, maxHp: 150, dmg: [25,40], xp: 100 }
+];
+
+// ─── POTIONS MINI-GAME ────────────────────────────
+const POTION_RECIPES = [
+  {
+    name: 'Potion de Soin',
+    icon: '❤️',
+    required: ['🌿','💧','🍄'],
+    reward: { item: 'potion_soin', xp: 30, skillXp: 20 }
+  },
+  {
+    name: 'Potion de Force',
+    icon: '💪',
+    required: ['🐉','🔥','⚗️'],
+    reward: { item: 'potion_mana', xp: 40, skillXp: 25 }
+  },
+  {
+    name: 'Potion de Révélation',
+    icon: '✨',
+    required: ['🌙','⭐','💎'],
+    reward: { item: 'lunettes', xp: 60, skillXp: 35 }
+  }
+];
+
+const POTION_INGREDIENTS = ['🌿','💧','🍄','🐉','🔥','⚗️','🌙','⭐','💎','🍃','🧊','🌸'];
+
+// ─── TEMP VARS ───────────────────────────────────
+let currentDialogue = null;
+let dialogueNPC = null;
+let dialogueStep = 0;
+let currentShopKey = 'default';
+let sortingScores = { courage: 0, loyalty: 0, intelligence: 0, cunning: 0 };
+let sortingQuestionIdx = 0;
+let charSelections = { avatar: '🧙', wand: '🪄', wandName: 'Bois de Chêne', pet: '🦉', petName: 'Chouette' };
+let weatherInterval = null;
+
+// ─── UTILITY FUNCTIONS ───────────────────────────
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+function saveGame() {
+  try { localStorage.setItem('poudlard_save', JSON.stringify(STATE)); } catch(e) {}
+}
+function loadGame() {
+  try {
+    const s = localStorage.getItem('poudlard_save');
+    if (s) { Object.assign(STATE, JSON.parse(s)); return true; }
+  } catch(e) {}
+  return false;
+}
+function switchTab(panelId, tabId) {
+  const panel = document.getElementById('panel-' + panelId);
+  panel.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  panel.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('tab-' + panelId + '-' + tabId).classList.add('active');
+}
+function selectAvatar(el, avatar) {
+  document.querySelectorAll('#avatar-grid .avatar-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  charSelections.avatar = avatar;
+}
+function selectWand(el, icon, name) {
+  document.querySelectorAll('.wand-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  charSelections.wand = icon;
+  charSelections.wandName = name;
+}
+function selectPet(el, icon, name) {
+  document.querySelectorAll('[data-pet]').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  charSelections.pet = icon;
+  charSelections.petName = name;
+}
+
+// ─── NOTIFICATIONS ────────────────────────────────
+function notify(title, text, type = 'xp', icon = '⭐') {
+  const container = document.getElementById('notifications');
+  const div = document.createElement('div');
+  div.className = `notif ${type}`;
+  div.innerHTML = `<span class="notif-icon">${icon}</span>
+    <div class="notif-text">
+      <div class="notif-title">${title}</div>
+      <div>${text}</div>
+    </div>`;
+  container.appendChild(div);
+  setTimeout(() => div.remove(), 3800);
+}
+
+// ─── FLOATING TEXT ────────────────────────────────
+function floatText(text, color = 'var(--gold)') {
+  const el = document.createElement('div');
+  el.className = 'float-particle';
+  el.style.cssText = `color:${color};left:${rand(30,70)}%;top:${rand(30,60)}%;font-weight:bold;`;
+  el.textContent = text;
+  document.getElementById('world').appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+
+// ─── XP SYSTEM ───────────────────────────────────
+function gainXP(amount) {
+  if (amount <= 0) return;
+  STATE.player.xp += amount;
+  STATE.player.xpTotal += amount;
+  floatText(`+${amount} XP`, 'var(--gold)');
+
+  while (STATE.player.xp >= STATE.player.xpNext) {
+    STATE.player.xp -= STATE.player.xpNext;
+    levelUp();
+  }
+  updateHUD();
+  saveGame();
+}
+
+function gainSkillXP(skill, amount) {
+  if (!STATE.player.skills[skill] !== undefined) return;
+  STATE.player.skills[skill] = (STATE.player.skills[skill] || 0) + amount;
+  if (STATE.player.skills[skill] > 100) STATE.player.skills[skill] = 100;
+  notify('Compétence Améliorée', `+${amount} en ${skill}`, 'success', '⚡');
+  saveGame();
+}
+
+function levelUp() {
+  STATE.player.level++;
+  STATE.player.xpNext = Math.floor(STATE.player.xpNext * 1.4);
+  STATE.player.hpMax += 10;
+  STATE.player.mpMax += 5;
+  STATE.player.hp = STATE.player.hpMax;
+  STATE.player.mp = STATE.player.mpMax;
+
+  if (STATE.player.level % 7 === 0) {
+    STATE.player.year = Math.min(7, STATE.player.year + 1);
+    notify('Nouvelle Année!', `Vous passez en ${STATE.player.year}ème année!`, 'success', '🎓');
+  }
+
+  document.getElementById('levelup-text').textContent = `Vous avez atteint le niveau ${STATE.player.level}!`;
+  document.getElementById('levelup-bonus').textContent = `+10 HP Max, +5 MP Max, +${STATE.player.level * 5} Points de Maison`;
+  document.getElementById('levelup-screen').style.display = 'flex';
+  saveGame();
+}
+
+function healPlayer(amount) {
+  STATE.player.hp = clamp(STATE.player.hp + amount, 0, STATE.player.hpMax);
+  floatText(`+${amount} HP`, '#ff4444');
+  updateHUD();
+}
+
+function restoreMP(amount) {
+  STATE.player.mp = clamp(STATE.player.mp + amount, 0, STATE.player.mpMax);
+  floatText(`+${amount} MP`, '#4488ff');
+  updateHUD();
+}
+
+function randomCandyEffect() {
+  const effects = [
+    () => { healPlayer(20); notify('Bonbon!', 'Délicieux! +20 HP', 'success', '🍬'); },
+    () => { gainXP(30); },
+    () => { STATE.player.mp = STATE.player.mpMax; notify('Bonbon!', 'Énergie magique restaurée!', 'success', '🍬'); },
+    () => { STATE.player.hp = Math.max(1, STATE.player.hp - 10); notify('Surprise!', 'Aïe... Saveur piment -10 HP', 'warning', '🌶️'); }
+  ];
+  effects[rand(0, effects.length-1)]();
+  updateHUD();
+}
+
+// ─── HUD UPDATE ───────────────────────────────────
+function updateHUD() {
+  const p = STATE.player;
+  document.getElementById('hud-avatar').textContent = p.avatar;
+  document.getElementById('hud-name').textContent = p.name;
+  document.getElementById('hud-level').textContent = p.level;
+  document.getElementById('hud-galleons').textContent = '💰 ' + p.galleons;
+  document.getElementById('hp-bar').style.width = (p.hp / p.hpMax * 100) + '%';
+  document.getElementById('mp-bar').style.width = (p.mp / p.mpMax * 100) + '%';
+  document.getElementById('xp-bar').style.width = (p.xp / p.xpNext * 100) + '%';
+  document.getElementById('hp-text').textContent = `${p.hp}/${p.hpMax}`;
+  document.getElementById('mp-text').textContent = `${p.mp}/${p.mpMax}`;
+  document.getElementById('xp-text').textContent = `${p.xp}/${p.xpNext}`;
+  document.getElementById('hud-house').textContent = HOUSES[p.house]?.badge || '🦁';
+  updateTimeDisplay();
+}
+
+function updateTimeDisplay() {
+  const w = STATE.world;
+  const h = Math.floor(w.time / 60);
+  const m = w.time % 60;
+  const timeStr = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  const period = h >= 6 && h < 12 ? '🌅' : h >= 12 && h < 18 ? '☀️' : h >= 18 && h < 21 ? '🌆' : '🌙';
+  document.getElementById('hud-time').textContent = `${period} ${timeStr}`;
+  const weathers = { clear: '☀️', rain: '🌧️', snow: '❄️', fog: '🌫️', storm: '⛈️', magic: '✨' };
+  document.getElementById('hud-weather').textContent = weathers[w.weather] || '☀️';
+}
+
+// ─── TIME & WEATHER SYSTEM ───────────────────────
+function tickTime() {
+  STATE.world.time = (STATE.world.time + 1) % (24 * 60);
+  updateDayNight();
+  if (STATE.world.time % 60 === 0) updateNPCRoutines();
+  // Weather changes
+  STATE.world.weatherTimer++;
+  if (STATE.world.weatherTimer > 20 + rand(0,40)) {
+    const weathers = ['clear','clear','clear','rain','snow','fog','storm','magic'];
+    STATE.world.weather = weathers[rand(0, weathers.length-1)];
+    STATE.world.weatherTimer = 0;
+    updateWeather();
+  }
+  updateTimeDisplay();
+  saveGame();
+}
+
+function updateDayNight() {
+  const h = Math.floor(STATE.world.time / 60);
+  const overlay = document.getElementById('daynight');
+  let color = 'transparent';
+  if (h >= 21 || h < 6) color = 'rgba(0,0,30,0.6)';
+  else if (h < 8) color = 'rgba(20,5,0,0.3)';
+  else if (h >= 18) color = 'rgba(30,10,0,0.3)';
+  overlay.style.background = color;
+}
+
+function updateWeather() {
+  const overlay = document.getElementById('weather-overlay');
+  overlay.innerHTML = '';
+  const w = STATE.world.weather;
+  if (w === 'rain') {
+    for (let i = 0; i < 40; i++) {
+      const drop = document.createElement('div');
+      drop.className = 'rain-drop';
+      drop.style.cssText = `left:${rand(0,100)}%;animation-duration:${0.5+Math.random()*0.5}s;animation-delay:${Math.random()*1}s;`;
+      overlay.appendChild(drop);
+    }
+  } else if (w === 'snow') {
+    for (let i = 0; i < 25; i++) {
+      const flake = document.createElement('div');
+      flake.className = 'snow-flake';
+      flake.textContent = '❄';
+      flake.style.cssText = `left:${rand(0,100)}%;animation-duration:${2+Math.random()*3}s;animation-delay:${Math.random()*2}s;`;
+      overlay.appendChild(flake);
+    }
+  } else if (w === 'magic') {
+    const colors = ['#ff88ff','#88aaff','#ffdd44','#44ffaa'];
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'magic-particle';
+      p.style.cssText = `left:${rand(0,100)}%;background:${colors[rand(0,3)]};box-shadow:0 0 6px ${colors[rand(0,3)]};animation-duration:${3+Math.random()*4}s;animation-delay:${Math.random()*3}s;`;
+      overlay.appendChild(p);
+    }
+    notify('Magie dans l\'air!', 'Des particules magiques flottent autour de vous...', 'quest', '✨');
+  }
+}
+
+function updateNPCRoutines() {
+  const h = Math.floor(STATE.world.time / 60);
+  if (h === 8) notify('PNJ', 'Les cours commencent à Poudlard!', 'quest', '📚');
+  if (h === 12) notify('PNJ', 'L\'heure du repas à la Grande Salle!', 'quest', '🍽️');
+  if (h === 19) notify('PNJ', 'Le soir tombe sur Poudlard...', 'quest', '🌙');
+  if (h === 23) notify('Couvre-feu', 'Rentrez dans votre dortoir!', 'warning', '⚠️');
+}
+
+// ─── MAIN GAME OBJECT ────────────────────────────
+const Game = {
+  startGame() {
+    document.getElementById('splash').style.display = 'none';
+    const saved = loadGame();
+    if (saved && STATE.game.started) {
+      this.launchWorld();
+      notify('Partie Chargée', 'Bienvenue à nouveau!', 'success', '✨');
+    } else {
+      document.getElementById('char-creation').style.display = 'flex';
+    }
+  },
+
+  goToSortingHat() {
+    const nameInput = document.getElementById('char-name').value.trim();
+    if (!nameInput) {
+      alert('Entrez votre nom de sorcier!');
+      return;
+    }
+    STATE.player.name = nameInput;
+    STATE.player.avatar = charSelections.avatar;
+    STATE.player.wand = charSelections.wand;
+    STATE.player.wandName = charSelections.wandName;
+    STATE.player.pet = charSelections.pet;
+    STATE.player.petName = charSelections.petName;
+
+    document.getElementById('char-creation').style.display = 'none';
+    document.getElementById('sorting-hat').style.display = 'flex';
+    sortingQuestionIdx = 0;
+    sortingScores = { courage: 0, loyalty: 0, intelligence: 0, cunning: 0 };
+    this.showSortingQuestion();
+  },
+
+  showSortingQuestion() {
+    if (sortingQuestionIdx >= SORTING_QUESTIONS.length) {
+      this.revealHouse();
+      return;
+    }
+    const q = SORTING_QUESTIONS[sortingQuestionIdx];
+    document.getElementById('hat-speech').textContent = `Question ${sortingQuestionIdx + 1}/${SORTING_QUESTIONS.length}`;
+    document.getElementById('quiz-question').textContent = `« ${q.text} »`;
+    const answersEl = document.getElementById('quiz-answers');
+    answersEl.innerHTML = '';
+    q.answers.forEach(a => {
+      const btn = document.createElement('div');
+      btn.className = 'quiz-answer';
+      btn.textContent = a.text;
+      btn.onclick = () => {
+        sortingScores[a.trait]++;
+        sortingQuestionIdx++;
+        Game.showSortingQuestion();
+      };
+      answersEl.appendChild(btn);
+    });
+  },
+
+  revealHouse() {
+    document.getElementById('quiz-container').style.display = 'none';
+    const scores = sortingScores;
+    let house = 'gryffondor';
+    const maxScore = Math.max(scores.courage, scores.loyalty, scores.intelligence, scores.cunning);
+    if (scores.courage === maxScore) house = 'gryffondor';
+    else if (scores.intelligence === maxScore) house = 'serdaigle';
+    else if (scores.loyalty === maxScore) house = 'poufsouffle';
+    else house = 'serpentard';
+
+    STATE.player.house = house;
+    const h = HOUSES[house];
+    document.getElementById('house-badge').textContent = h.badge;
+    document.getElementById('house-name-display').textContent = h.name;
+    document.getElementById('house-motto').textContent = h.motto;
+    document.getElementById('house-name-display').style.color = h.color;
+    document.getElementById('house-result').style.display = 'block';
+
+    notify('Maison Révélée!', `Bienvenue à ${h.name}!`, 'success', h.badge);
+  },
+
+  finishCreation() {
+    document.getElementById('sorting-hat').style.display = 'none';
+    STATE.game.started = true;
+    STATE.game.sortingDone = true;
+    // Give starter inventory
+    addToInventory('potion_soin');
+    addToInventory('parchemin');
+    this.launchWorld();
+    saveGame();
+    // Start main quest
+    setTimeout(() => { this.talkToNPC('dumbledore'); }, 2000);
+  },
+
+  launchWorld() {
+    document.getElementById('hud').style.display = 'flex';
+    document.getElementById('bottom-nav').style.display = 'flex';
+    document.getElementById('world').style.display = 'block';
+    document.getElementById('minimap').style.display = 'block';
+    updateHUD();
+    this.updatePlayerSprite();
+    this.setScene('hogwarts');
+    updateWeather();
+    setInterval(tickTime, 8000); // 1 real second = 2 game minutes
+  },
+
+  updatePlayerSprite() {
+    document.getElementById('player-sprite').textContent = STATE.player.avatar;
+    document.getElementById('player-tag').textContent = STATE.player.name;
+    document.getElementById('player').style.cssText = 'left:50%;top:50%;transform:translate(-50%,-50%)';
+  },
+
+  setScene(sceneId) {
+    STATE.world.prevScene = STATE.world.scene;
+    STATE.world.scene = sceneId;
+    document.querySelectorAll('.world-scene').forEach(s => s.classList.remove('active'));
+    const scene = document.getElementById('scene-' + sceneId);
+    if (scene) {
+      scene.classList.add('active');
+      // Update location names
+      const names = {
+        hogwarts: 'POUDLARD', 'great-hall': 'GRANDE SALLE', diagon: 'CH. DE TRAVERSE',
+        forest: 'FORÊT INTERDITE', hogsmeade: 'PRÉ-AU-LARD', library: 'BIBLIOTHÈQUE', dungeon: 'CACHOTS'
+      };
+      document.getElementById('hud-location').textContent = names[sceneId] || sceneId.toUpperCase();
+    }
+    // Move minimap dot
+    const positions = {
+      hogwarts: { left: '15%', top: '20%' },
+      'great-hall': { left: '20%', top: '25%' },
+      diagon: { left: '50%', top: '75%' },
+      forest: { left: '40%', top: '65%' },
+      hogsmeade: { left: '70%', top: '20%' },
+      library: { left: '18%', top: '18%' },
+      dungeon: { left: '22%', top: '30%' }
+    };
+    const pos = positions[sceneId] || { left: '50%', top: '50%' };
+    const dot = document.getElementById('minimap-player');
+    if (dot) { dot.style.left = pos.left; dot.style.top = pos.top; }
+  },
+
+  openScene(sceneId) {
+    this.setScene(sceneId);
+    document.getElementById('map-screen').style.display = 'none';
+  },
+
+  goBack() {
+    const prev = STATE.world.prevScene || 'hogwarts';
+    this.setScene(prev);
+  },
+
+  showWorld() {
+    document.getElementById('map-screen').style.display = 'none';
+    document.getElementById('quidditch-screen').style.display = 'none';
+    document.getElementById('duel-screen').style.display = 'none';
+    document.getElementById('potion-game').style.display = 'none';
+    document.getElementById('profile-screen').style.display = 'none';
+    document.getElementById('world').style.display = 'block';
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('nav-world').classList.add('active');
+  },
+
+  // ─ DIALOGUE SYSTEM ─────────────────────────────
+  talkToNPC(npcId) {
+    const npc = NPCS[npcId];
+    if (!npc) return;
+    dialogueNPC = npcId;
+    dialogueStep = 0;
+    currentDialogue = npc.dialogues[0];
+    this.showDialogue(npc, currentDialogue);
+    gainRelation(npcId, 2);
+  },
+
+  showDialogue(npc, dialogue) {
+    if (!dialogue) { this.closeDialogue(); return; }
+    const box = document.getElementById('dialogue-box');
+    const text = dialogue.text.replace('%s', STATE.player.name);
+    document.getElementById('dialogue-speaker').innerHTML = `${npc.icon} ${npc.name.toUpperCase()}`;
+    document.getElementById('dialogue-text').textContent = '';
+    box.style.display = 'block';
+    document.getElementById('dialogue-continue').style.display = 'none';
+    document.getElementById('dialogue-choices').innerHTML = '';
+
+    // Typewriter effect
+    let i = 0;
+    const textEl = document.getElementById('dialogue-text');
+    const interval = setInterval(() => {
+      textEl.textContent += text[i];
+      i++;
+      if (i >= text.length) {
+        clearInterval(interval);
+        if (dialogue.choices && dialogue.choices.length > 0) {
+          this.showChoices(npc, dialogue.choices);
+        } else {
+          document.getElementById('dialogue-continue').style.display = 'block';
+        }
+      }
+    }, 22);
+  },
+
+  showChoices(npc, choices) {
+    const container = document.getElementById('dialogue-choices');
+    container.innerHTML = '';
+    choices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'dialogue-choice';
+      btn.textContent = choice.text;
+      btn.onclick = () => {
+        // Apply rewards
+        if (choice.xp) gainXP(choice.xp > 0 ? choice.xp : 0);
+        if (choice.skillXp) Object.entries(choice.skillXp).forEach(([s,v]) => gainSkillXP(s,v));
+        if (choice.relation) gainRelation(dialogueNPC, choice.relation);
+        if (choice.questStart) startQuest(choice.questStart);
+        if (choice.questStep) advanceQuestStep(choice.questStep);
+        if (choice.action === 'quidditch') { this.closeDialogue(); this.startQuidditch(); }
+        if (choice.buy) this.buyFromNPC(choice.buy);
+
+        if (choice.next) {
+          // Find next dialogue
+          const allDialogues = NPCS[dialogueNPC].dialogues;
+          const nextD = allDialogues.find(d => d.id === choice.next) || null;
+          if (nextD) { this.showDialogue(npc, nextD); }
+          else { this.closeDialogue(); }
+        } else {
+          this.closeDialogue();
+        }
+      };
+      container.appendChild(btn);
+    });
+  },
+
+  buyFromNPC(buyData) {
+    if (STATE.player.galleons >= buyData.price) {
+      STATE.player.galleons -= buyData.price;
+      addToInventory(null, buyData.item, buyData.name);
+      notify('Achat!', `${buyData.item} ${buyData.name} acheté!`, 'success', buyData.item);
+      updateHUD();
+    } else {
+      notify('Fonds insuffisants', 'Vous n\'avez pas assez de Gallions!', 'warning', '💰');
+    }
+  },
+
+  nextDialogue() {
+    this.closeDialogue();
+  },
+
+  closeDialogue() {
+    document.getElementById('dialogue-box').style.display = 'none';
+    currentDialogue = null;
+    dialogueNPC = null;
+  },
+
+  // ─ INTERACTIONS ────────────────────────────────
+  interact(id) {
+    const interactions = {
+      portal_platform: () => {
+        this.showWorld();
+        notify('Quai 9¾', 'Vous sentez la magie du quai... L\'Eclair de Poudlard part bientôt!', 'quest', '🚂');
+        gainXP(15);
+      },
+      restricted_section: () => {
+        if (STATE.player.skills.sortileges >= 20) {
+          gainXP(40); gainSkillXP('sortileges', 10);
+          notify('Section Interdite!', 'Vous avez trouvé un grimoire ancien!', 'success', '📚');
+          addToInventory('parchemin');
+        } else {
+          notify('Accès Refusé', 'Vos sortilèges ne sont pas assez avancés... (Sortilèges niveau 20)', 'warning', '⛔');
+        }
+      },
+      azkaban_portal: () => {
+        notify('Maison Hurlante', 'De gémissements s\'échappent de la demeure... Vous frissonnez.', 'warning', '🏚️');
+        gainXP(10);
+      },
+      cauldron_lesson: () => {
+        gainXP(25); gainSkillXP('potions', 15);
+        notify('Cours de Potions', 'Vous assistez au cours du Professeur Rogue!', 'quest', '🧪');
+      }
+    };
+    if (interactions[id]) interactions[id]();
+  },
+
+  huntCreature(type) {
+    const creatures = {
+      centaure: { name: 'Centaure', xp: 30, skill: 'defense' },
+      licorne: { name: 'Licorne', xp: 50, skill: 'botanique', item: 'pierre_lune' },
+      araignee: { name: 'Araignée Géante', xp: 40, skill: 'duel' },
+      thestrals: { name: 'Thestral', xp: 45, skill: 'vol' }
+    };
+    const c = creatures[type];
+    if (!c) return;
+
+    if (rand(0,1)) {
+      gainXP(c.xp);
+      gainSkillXP(c.skill, 15);
+      if (c.item) addToInventory(c.item);
+      notify(`Créature: ${c.name}`, `Vous avez observé une créature magique!`, 'success', '🦄');
+    } else {
+      STATE.player.hp = Math.max(1, STATE.player.hp - rand(5,15));
+      notify(`Créature: ${c.name}`, `La créature vous a blessé! Faites attention!`, 'warning', '⚠️');
+      updateHUD();
+    }
+  },
+
+  readBook(type) {
+    const books = {
+      histoire: { xp: 20, skill: 'sortileges', msg: 'Histoire des Quatre Fondateurs de Poudlard...' },
+      sortileges: { xp: 25, skill: 'sortileges', msg: 'Nouvelles incantations découvertes!' },
+      bestiaire: { xp: 20, skill: 'botanique', msg: 'Créatures fantastiques et où les trouver...' }
+    };
+    const b = books[type];
+    gainXP(b.xp);
+    gainSkillXP(b.skill, 12);
+    notify('Lecture', b.msg, 'quest', '📖');
+  },
+
+  // ─ DUEL SYSTEM ─────────────────────────────────
+  startDuel(enemyIdx) {
+    const enemy = enemyIdx !== undefined ? ENEMIES[enemyIdx] : ENEMIES[rand(0, ENEMIES.length-1)];
+    STATE.duel = {
+      active: true,
+      enemy: { ...enemy },
+      playerHp: STATE.player.hp,
+      enemyHp: enemy.hp
+    };
+
+    document.getElementById('world').style.display = 'none';
+    document.getElementById('duel-screen').style.display = 'flex';
+    document.getElementById('duel-player-name').textContent = STATE.player.name.toUpperCase();
+    document.getElementById('duel-enemy-name').textContent = enemy.name.toUpperCase();
+    document.getElementById('duel-player-fig').textContent = STATE.player.avatar;
+    document.getElementById('duel-enemy-fig').textContent = enemy.icon;
+    this.updateDuelBars();
+    this.buildSpellButtons();
+    document.getElementById('duel-log').innerHTML = `<div class="duel-log-entry system">⚔️ Duel commencé contre ${enemy.name}! Choisissez votre sort!</div>`;
+  },
+
+  updateDuelBars() {
+    const d = STATE.duel;
+    const phpct = d.playerHp / STATE.player.hpMax * 100;
+    const ehpct = d.enemyHp / d.enemy.maxHp * 100;
+    document.getElementById('duel-player-hp').style.width = phpct + '%';
+    document.getElementById('duel-enemy-hp').style.width = ehpct + '%';
+    document.getElementById('duel-player-hp-text').textContent = `${d.playerHp}/${STATE.player.hpMax}`;
+    document.getElementById('duel-enemy-hp-text').textContent = `${d.enemyHp}/${d.enemy.maxHp}`;
+  },
+
+  buildSpellButtons() {
+    const container = document.getElementById('duel-spells');
+    container.innerHTML = '';
+    SPELLS.forEach((spell, idx) => {
+      const btn = document.createElement('div');
+      btn.className = 'duel-spell';
+      btn.innerHTML = `<span class="spell-icon">${spell.icon}</span>
+        <div class="spell-name">${spell.name}</div>
+        <div class="spell-mp">💙 ${spell.mp}</div>`;
+      btn.onclick = () => this.castSpell(idx);
+      container.appendChild(btn);
+    });
+  },
+
+  castSpell(spellIdx) {
+    if (!STATE.duel.active) return;
+    const spell = SPELLS[spellIdx];
+    if (STATE.player.mp < spell.mp) {
+      notify('Mana insuffisant', `Vous n'avez pas assez de mana pour ${spell.name}!`, 'warning', '💙');
+      return;
+    }
+    STATE.player.mp -= spell.mp;
+
+    let dmg = rand(spell.dmg[0], spell.dmg[1]);
+    let logText = '';
+
+    if (spell.type === 'heal') {
+      const heal = Math.abs(dmg);
+      STATE.duel.playerHp = Math.min(STATE.player.hpMax, STATE.duel.playerHp + heal);
+      logText = `✨ Vous lancez ${spell.name} — Soin de ${heal} HP!`;
+    } else {
+      const bonus = Math.floor((STATE.player.skills.sortileges || 0) / 20);
+      dmg += bonus;
+      STATE.duel.enemyHp -= dmg;
+      logText = `${spell.icon} Vous lancez ${spell.name} — ${dmg} dégâts!`;
+    }
+
+    // Flash beam
+    const beam = document.getElementById('duel-beam');
+    beam.classList.add('active');
+    beam.style.background = `linear-gradient(90deg, ${getSpellColor(spell.type)}, #ff4444)`;
+    setTimeout(() => beam.classList.remove('active'), 300);
+
+    this.addDuelLog(logText, 'player');
+    this.updateDuelBars();
+    updateHUD();
+
+    if (STATE.duel.enemyHp <= 0) {
+      this.winDuel();
+      return;
+    }
+
+    // Enemy turn (delayed)
+    setTimeout(() => this.enemyTurn(), 800);
+  },
+
+  enemyTurn() {
+    if (!STATE.duel.active) return;
+    const enemy = STATE.duel.enemy;
+    const dmg = rand(enemy.dmg[0], enemy.dmg[1]);
+    const defBonus = Math.floor((STATE.player.skills.defense || 0) / 25);
+    const finalDmg = Math.max(1, dmg - defBonus);
+    STATE.duel.playerHp -= finalDmg;
+    this.addDuelLog(`${enemy.icon} ${enemy.name} attaque — ${finalDmg} dégâts!`, 'enemy');
+    this.updateDuelBars();
+
+    if (STATE.duel.playerHp <= 0) {
+      this.loseDuel();
+    }
+  },
+
+  winDuel() {
+    STATE.duel.active = false;
+    const xpGain = STATE.duel.enemy.xp;
+    const goldGain = rand(5, 20);
+    STATE.player.hp = STATE.duel.playerHp;
+    STATE.player.galleons += goldGain;
+    STATE.player.stats.duels++;
+    gainXP(xpGain);
+    gainSkillXP('duel', 20);
+    this.addDuelLog(`🏆 VICTOIRE! +${xpGain} XP, +${goldGain} Gallions!`, 'system');
+    setTimeout(() => {
+      this.closeDuel();
+      notify('Victoire!', `Vous avez vaincu ${STATE.duel?.enemy?.name || 'l\'adversaire'}! +${xpGain}XP`, 'success', '🏆');
+    }, 1500);
+    updateHUD();
+    saveGame();
+  },
+
+  loseDuel() {
+    STATE.duel.active = false;
+    STATE.player.hp = 5;
+    STATE.player.galleons = Math.max(0, STATE.player.galleons - 10);
+    gainXP(15);
+    gainSkillXP('defense', 10);
+    this.addDuelLog(`💀 Défaite... -10 Gallions. Reposez-vous à l'infirmerie.`, 'system');
+    setTimeout(() => {
+      this.closeDuel();
+      notify('Défaite', 'Vous avez perdu le duel... Recuperez-vous!', 'warning', '💔');
+    }, 1500);
+    updateHUD();
+    saveGame();
+  },
+
+  addDuelLog(text, type) {
+    const log = document.getElementById('duel-log');
+    const entry = document.createElement('div');
+    entry.className = `duel-log-entry ${type}`;
+    entry.textContent = text;
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+  },
+
+  closeDuel() {
+    document.getElementById('duel-screen').style.display = 'none';
+    document.getElementById('world').style.display = 'block';
+    STATE.duel.active = false;
+  },
+
+  // ─ POTIONS MINI-GAME ───────────────────────────
+  openPotions() {
+    const recipe = POTION_RECIPES[rand(0, POTION_RECIPES.length-1)];
+    STATE.potion = { active: true, recipe, added: [] };
+
+    document.getElementById('world').style.display = 'none';
+    document.getElementById('potion-game').style.display = 'flex';
+    document.getElementById('potion-recipe-name').textContent = recipe.icon + ' ' + recipe.name;
+    document.getElementById('potion-result').textContent = '';
+
+    // Build required ingredients display
+    const reqEl = document.getElementById('potion-required');
+    reqEl.innerHTML = recipe.required.map(r => `<div class="potion-ingredient" data-req="${r}">${r} <span style="font-size:10px;opacity:0.6">${r}</span></div>`).join('');
+
+    // Build available slots
+    const slotsEl = document.getElementById('potion-slots');
+    slotsEl.innerHTML = '';
+    const shuffled = [...POTION_INGREDIENTS].sort(() => Math.random()-0.5).slice(0, 12);
+    shuffled.forEach(ing => {
+      const slot = document.createElement('div');
+      slot.className = 'potion-slot';
+      slot.innerHTML = `${ing}<div class="potion-slot-name">${ing}</div>`;
+      slot.onclick = () => this.addIngredient(ing, slot);
+      slotsEl.appendChild(slot);
+    });
+  },
+
+  addIngredient(ing, slotEl) {
+    if (STATE.potion.added.includes(ing)) {
+      notify('Déjà ajouté', 'Cet ingrédient est déjà dans le chaudron!', 'warning', '⚗️');
+      return;
+    }
+    STATE.potion.added.push(ing);
+    slotEl.style.opacity = '0.4';
+    slotEl.style.pointerEvents = 'none';
+
+    // Update required display
+    const reqEls = document.querySelectorAll(`[data-req="${ing}"]`);
+    reqEls.forEach(el => el.classList.add('added'));
+
+    notify('Ingrédient ajouté!', `${ing} ajouté au chaudron!`, 'success', '⚗️');
+  },
+
+  brewPotion() {
+    const recipe = STATE.potion.recipe;
+    const required = recipe.required;
+    const allAdded = required.every(r => STATE.potion.added.includes(r));
+
+    if (allAdded) {
+      const result = document.getElementById('potion-result');
+      result.textContent = `✅ Excellente potion de ${recipe.name} préparée!`;
+      result.style.color = '#00cc66';
+      gainXP(recipe.reward.xp);
+      gainSkillXP('potions', recipe.reward.skillXp);
+      if (recipe.reward.item) addToInventory(recipe.reward.item);
+      STATE.player.stats.potions++;
+      notify('Potion Réussie!', `${recipe.icon} ${recipe.name} créée!`, 'success', '⚗️');
+      // Advance quest if applicable
+      if (STATE.player.quests.includes('side_potion')) {
+        completeQuest('side_potion');
+      }
+      saveGame();
+    } else {
+      const missing = required.filter(r => !STATE.potion.added.includes(r));
+      document.getElementById('potion-result').textContent = `❌ Ingrédients manquants: ${missing.join(', ')}`;
+      document.getElementById('potion-result').style.color = '#ff4444';
+    }
+  },
+
+  closePotions() {
+    document.getElementById('potion-game').style.display = 'none';
+    document.getElementById('world').style.display = 'block';
+    STATE.potion.active = false;
+  },
+
+  // ─ QUIDDITCH ───────────────────────────────────
+  startQuidditch() {
+    document.getElementById('world').style.display = 'none';
+    document.getElementById('quidditch-screen').style.display = 'flex';
+    STATE.quidditch = { score: [0,0], timer: 120, interval: null, playerX: 45, playerY: 45 };
+    document.getElementById('quidditch-score').textContent = '0 — 0';
+    document.getElementById('quidditch-timer').textContent = '⏱️ 120s';
+    document.getElementById('quidditch-msg').textContent = 'Attrapez le Vif d\'Or (✨) ou marquez des buts!';
+
+    STATE.quidditch.interval = setInterval(() => {
+      STATE.quidditch.timer--;
+      document.getElementById('quidditch-timer').textContent = `⏱️ ${STATE.quidditch.timer}s`;
+
+      // Move snitch randomly
+      const snitch = document.getElementById('q-snitch');
+      const newX = clamp(rand(5,90), 5, 90);
+      const newY = clamp(rand(5,85), 5, 85);
+      snitch.style.left = newX + '%';
+      snitch.style.top = newY + '%';
+
+      // Enemy might score
+      if (rand(0,20) === 0) {
+        STATE.quidditch.score[1]++;
+        document.getElementById('quidditch-score').textContent = `${STATE.quidditch.score[0]} — ${STATE.quidditch.score[1]}`;
+        document.getElementById('quidditch-msg').textContent = "⚠️ L'équipe adverse marque!";
+      }
+
+      if (STATE.quidditch.timer <= 0) {
+        clearInterval(STATE.quidditch.interval);
+        this.endQuidditch(false);
+      }
+    }, 1000);
+  },
+
+  quidditchAction(dir) {
+    const player = document.getElementById('q-player');
+    const snitch = document.getElementById('q-snitch');
+    let x = STATE.quidditch.playerX;
+    let y = STATE.quidditch.playerY;
+    const step = 12;
+
+    if (dir === 'left') x = clamp(x - step, 2, 92);
+    if (dir === 'right') x = clamp(x + step, 2, 92);
+    if (dir === 'up') y = clamp(y - step, 2, 88);
+    if (dir === 'down') y = clamp(y + step, 2, 88);
+
+    STATE.quidditch.playerX = x;
+    STATE.quidditch.playerY = y;
+    player.style.left = x + '%';
+    player.style.top = y + '%';
+
+    gainSkillXP('vol', 2);
+
+    // Check snitch collision
+    const sx = parseFloat(snitch.style.left);
+    const sy = parseFloat(snitch.style.top);
+    if (Math.abs(x - sx) < 15 && Math.abs(y - sy) < 15) {
+      clearInterval(STATE.quidditch.interval);
+      document.getElementById('quidditch-msg').textContent = '🏆 Vous avez attrapé le Vif d\'Or!';
+      STATE.quidditch.score[0] += 150;
+      document.getElementById('quidditch-score').textContent = `${STATE.quidditch.score[0]} — ${STATE.quidditch.score[1]}`;
+      setTimeout(() => this.endQuidditch(true), 1500);
+      return;
+    }
+
+    // Random scoring
+    if (rand(0,4) === 0) {
+      STATE.quidditch.score[0] += 10;
+      document.getElementById('quidditch-score').textContent = `${STATE.quidditch.score[0]} — ${STATE.quidditch.score[1]}`;
+      document.getElementById('quidditch-msg').textContent = '⚡ But marqué! +10 points!';
+    }
+  },
+
+  endQuidditch(caughtSnitch) {
+    clearInterval(STATE.quidditch.interval);
+    const score = STATE.quidditch.score;
+    const won = score[0] > score[1] || caughtSnitch;
+    const xpGain = won ? 100 : 40;
+    const goldGain = won ? 30 : 5;
+
+    gainXP(xpGain);
+    gainSkillXP('vol', 30);
+    STATE.player.galleons += goldGain;
+    updateHUD();
+    saveGame();
+
+    if (won) {
+      notify('Victoire au Quidditch!', `Score: ${score[0]}-${score[1]} — +${xpGain}XP, +${goldGain}G!`, 'success', '🏆');
+    } else {
+      notify('Match Terminé', `Score: ${score[0]}-${score[1]} — +${xpGain}XP`, 'quest', '🦅');
+    }
+    setTimeout(() => this.closeQuidditch(), 2000);
+  },
+
+  closeQuidditch() {
+    if (STATE.quidditch.interval) clearInterval(STATE.quidditch.interval);
+    document.getElementById('quidditch-screen').style.display = 'none';
+    document.getElementById('world').style.display = 'block';
+  },
+
+  // ─ SHOP ─────────────────────────────────────────
+  openShop(shopKey = 'default') {
+    currentShopKey = shopKey;
+    const shop = SHOPS[shopKey];
+    document.getElementById('shop-title').textContent = shop.title;
+    document.getElementById('shop-galleons').textContent = STATE.player.galleons;
+
+    const grid = document.getElementById('shop-items-grid');
+    grid.innerHTML = '';
+    shop.items.forEach(itemKey => {
+      const item = ITEMS[itemKey];
+      if (!item) return;
+      const div = document.createElement('div');
+      div.className = 'shop-item';
+      div.innerHTML = `
+        <div class="shop-item-header">
+          <span class="shop-item-icon">${item.icon}</span>
+          <span class="shop-item-name">${item.name}</span>
+        </div>
+        <div class="shop-item-desc">${item.desc}</div>
+        <div class="shop-item-price">🥇 ${item.price} Gallions</div>`;
+      div.onclick = () => this.purchaseItem(itemKey);
+      grid.appendChild(div);
+    });
+
+    document.getElementById('panel-shop').classList.add('open');
+  },
+
+  purchaseItem(itemKey) {
+    const item = ITEMS[itemKey];
+    if (!item) return;
+    if (STATE.player.galleons < item.price) {
+      notify('Fonds insuffisants', `Vous avez besoin de ${item.price} Gallions!`, 'warning', '💰');
+      return;
+    }
+    STATE.player.galleons -= item.price;
+    addToInventory(itemKey);
+    document.getElementById('shop-galleons').textContent = STATE.player.galleons;
+    document.getElementById('inv-galleons').textContent = STATE.player.galleons;
+    document.getElementById('hud-galleons').textContent = '💰 ' + STATE.player.galleons;
+    notify('Achat!', `${item.icon} ${item.name} acheté!`, 'success', item.icon);
+    if (item.effect) item.effect();
+    saveGame();
+  },
+
+  openShopGringotts() { this.openShop('gringotts'); },
+  openShopOllivander() { this.openShop('ollivander'); },
+  openShopZonon() { this.openShop('zonon'); },
+  openShopHoneydukes() { this.openShop('honeydukes'); },
+  openShopHogHead() { this.openShop('hoghead'); },
+  openShopThreeBroomsticks() { this.openShop('threebroomsticks'); },
+  openShopPotionIngredients() { this.openShop('potion_ingredients'); },
+
+  // ─ PANELS ────────────────────────────────────────
+  openInventory() {
+    document.getElementById('inv-galleons').textContent = STATE.player.galleons;
+    document.getElementById('inv-mornilles').textContent = STATE.player.mornilles;
+    document.getElementById('inv-noises').textContent = STATE.player.noises;
+    renderInventory();
+    document.getElementById('panel-inventory').classList.add('open');
+  },
+
+  openSkills() {
+    document.getElementById('skill-year').textContent = STATE.player.year;
+    document.getElementById('skill-level-display').textContent = STATE.player.level;
+    renderSkills();
+    document.getElementById('panel-skills').classList.add('open');
+  },
+
+  openQuests() {
+    renderQuests();
+    document.getElementById('panel-quests').classList.add('open');
+  },
+
+  openProfile() {
+    const p = STATE.player;
+    document.getElementById('profile-avatar-display').textContent = p.avatar;
+    document.getElementById('profile-name').textContent = p.name;
+    const h = HOUSES[p.house];
+    document.getElementById('profile-house').textContent = `${h?.badge || '🦁'} ${h?.name || 'Gryffondor'} — ${p.year}ème Année`;
+    document.getElementById('profile-wand').textContent = `${p.wand} ${p.wandName} | ${p.pet} ${p.petName}`;
+    document.getElementById('prof-level').textContent = p.level;
+    document.getElementById('prof-xp').textContent = p.xpTotal;
+    document.getElementById('prof-gold').textContent = p.galleons;
+    document.getElementById('prof-quests').textContent = p.questsDone.length;
+    document.getElementById('prof-duels').textContent = p.stats.duels;
+    document.getElementById('prof-potions').textContent = p.stats.potions;
+    renderRelations();
+    document.getElementById('profile-screen').style.display = 'flex';
+    document.getElementById('world').style.display = 'none';
+  },
+
+  closeProfile() {
+    document.getElementById('profile-screen').style.display = 'none';
+    document.getElementById('world').style.display = 'block';
+  },
+
+  closePanel(id) {
+    document.getElementById('panel-' + id).classList.remove('open');
+  },
+
+  openMap() {
+    renderMap();
+    document.getElementById('world').style.display = 'none';
+    document.getElementById('map-screen').style.display = 'flex';
+  },
+
+  closeMap() {
+    document.getElementById('map-screen').style.display = 'none';
+    document.getElementById('world').style.display = 'block';
+  },
+
+  closeLevelUp() {
+    document.getElementById('levelup-screen').style.display = 'none';
+  }
+};
+
+// ─── RENDER FUNCTIONS ────────────────────────────
+function renderInventory() {
+  const grid = document.getElementById('inventory-grid');
+  grid.innerHTML = '';
+  const totalSlots = 20;
+  const inv = STATE.player.inventory;
+
+  for (let i = 0; i < totalSlots; i++) {
+    const slot = document.createElement('div');
+    if (i < inv.length) {
+      const item = inv[i];
+      slot.className = 'inv-slot occupied';
+      slot.innerHTML = `<span class="inv-slot-icon">${item.icon}</span>
+        <span class="inv-slot-name">${item.name}</span>
+        ${item.qty > 1 ? `<span class="inv-slot-qty">×${item.qty}</span>` : ''}`;
+      slot.title = item.desc || item.name;
+      slot.onclick = () => useInventoryItem(i);
+    } else {
+      slot.className = 'inv-slot';
+    }
+    grid.appendChild(slot);
+  }
+}
+
+function renderSkills() {
+  const grid = document.getElementById('skills-grid');
+  grid.innerHTML = '';
+  const skillIcons = { sortileges:'✨', potions:'⚗️', duel:'⚔️', botanique:'🌿', vol:'🧹', defense:'🛡️' };
+  const skillNames = { sortileges:'Sortilèges', potions:'Potions', duel:'Duel', botanique:'Botanique', vol:'Vol en Balai', defense:'Défense' };
+
+  Object.entries(STATE.player.skills).forEach(([key, val]) => {
+    const div = document.createElement('div');
+    div.className = 'skill-item';
+    const level = Math.floor(val / 10) + 1;
+    div.innerHTML = `
+      <div class="skill-header">
+        <span class="skill-name">${skillIcons[key]} ${skillNames[key]}</span>
+        <span class="skill-level">Nv${level}</span>
+      </div>
+      <div class="skill-bar"><div class="skill-bar-fill" style="width:${val}%"></div></div>
+      <div style="font-size:10px;color:var(--parchment-dark);margin-top:4px">${val}/100 XP</div>`;
+    grid.appendChild(div);
+  });
+}
+
+function renderQuests() {
+  const activeList = document.getElementById('quests-list');
+  const doneList = document.getElementById('quests-done-list');
+  activeList.innerHTML = '';
+  doneList.innerHTML = '';
+
+  if (STATE.player.quests.length === 0) {
+    activeList.innerHTML = '<div style="color:var(--parchment-dark);font-style:italic;padding:12px">Aucune quête active. Parlez aux PNJ!</div>';
+  }
+
+  STATE.player.quests.forEach(qId => {
+    const q = QUESTS_DATA[qId];
+    if (!q) return;
+    const div = document.createElement('div');
+    div.className = 'quest-item active';
+    const progress = rand(20, 80); // simplified
+    div.innerHTML = `
+      <div class="quest-header">
+        <span class="quest-name">${q.name}</span>
+        <span class="quest-badge ${q.type}">${q.type === 'main' ? 'PRINCIPALE' : 'SECONDAIRE'}</span>
+      </div>
+      <div class="quest-desc">${q.desc}</div>
+      <div style="font-size:11px;color:var(--gold);margin-top:6px">
+        ${q.steps.map((s,i) => `<div style="padding:2px 0">• ${s}</div>`).join('')}
+      </div>
+      <div style="font-size:11px;color:var(--parchment-dark);margin-top:6px">
+        Récompenses: ${q.rewards.xp} XP${q.rewards.galleons ? ', '+q.rewards.galleons+' Gallions' : ''}
+      </div>`;
+    activeList.appendChild(div);
+  });
+
+  STATE.player.questsDone.forEach(qId => {
+    const q = QUESTS_DATA[qId];
+    if (!q) return;
+    const div = document.createElement('div');
+    div.className = 'quest-item';
+    div.innerHTML = `
+      <div class="quest-header">
+        <span class="quest-name">${q.name}</span>
+        <span class="quest-badge done">TERMINÉE</span>
+      </div>
+      <div class="quest-desc">${q.desc}</div>`;
+    doneList.appendChild(div);
+  });
+}
+
+function renderRelations() {
+  const container = document.getElementById('profile-relations');
+  container.innerHTML = '';
+  const npcInfo = {
+    dumbledore: { name: 'Dumbledore', icon: '🧙‍♂️' },
+    hermione: { name: 'Hermione', icon: '👩‍🎓' },
+    ron: { name: 'Ron', icon: '👨‍🎓' },
+    hagrid: { name: 'Hagrid', icon: '🧔' },
+    snape: { name: 'Rogue', icon: '🧛' },
+    mcgonagall: { name: 'McGonagall', icon: '👩‍🏫' }
+  };
+  Object.entries(npcInfo).forEach(([id, info]) => {
+    const rel = STATE.player.relations[id] || 0;
+    const div = document.createElement('div');
+    div.className = 'relation-item';
+    div.innerHTML = `
+      <span class="relation-icon">${info.icon}</span>
+      <span class="relation-name">${info.name}</span>
+      <div class="relation-bar"><div class="relation-fill" style="width:${rel}%"></div></div>
+      <span style="font-size:10px;color:var(--gold);font-family:var(--font-ui)">${rel}%</span>`;
+    container.appendChild(div);
+  });
+}
+
+function renderMap() {
+  const grid = document.getElementById('map-grid');
+  const locations = [
+    { id: 'hogwarts', icon: '🏰', name: 'Poudlard', desc: 'Le château', locked: false },
+    { id: 'great-hall', icon: '🏛️', name: 'Grande Salle', desc: 'Cours & Repas', locked: false },
+    { id: 'library', icon: '📚', name: 'Bibliothèque', desc: 'Savoirs anciens', locked: false },
+    { id: 'dungeon', icon: '🧪', name: 'Cachots', desc: 'Cours de Potions', locked: false },
+    { id: 'hogsmeade', icon: '🏘️', name: 'Pré-au-Lard', desc: 'Village magique', locked: STATE.player.year < 3 },
+    { id: 'diagon', icon: '🏪', name: 'Ch. de Traverse', desc: 'Achats & Banque', locked: false },
+    { id: 'forest', icon: '🌲', name: 'Forêt Interdite', desc: 'Créatures & Mystères', locked: false },
+    { id: 'azkaban', icon: '🏚️', name: 'Azkaban', desc: 'Prison Maudite', locked: STATE.player.level < 10 },
+    { id: 'ministry', icon: '⚖️', name: 'Ministère', desc: 'Pouvoir Magique', locked: STATE.player.level < 8 }
+  ];
+
+  grid.innerHTML = '';
+  locations.forEach(loc => {
+    const div = document.createElement('div');
+    div.className = `map-location${loc.id === STATE.world.scene ? ' current' : ''}${loc.locked ? ' locked' : ''}`;
+    div.innerHTML = `
+      <span class="map-loc-icon">${loc.icon}</span>
+      <div class="map-loc-name">${loc.name}</div>
+      <div class="map-loc-desc">${loc.desc}</div>
+      ${loc.locked ? '<span class="map-loc-lock">🔒</span>' : ''}`;
+    if (!loc.locked) {
+      div.onclick = () => {
+        if (loc.id === 'azkaban' || loc.id === 'ministry') {
+          notify('Lieu spécial', 'Ce lieu sera disponible plus tard dans l\'aventure!', 'quest', '🗺️');
+        } else {
+          Game.openScene(loc.id);
+        }
+      };
+    } else {
+      div.onclick = () => {
+        const req = loc.id === 'hogsmeade' ? 'Niveau 3ème Année requis' : `Niveau ${loc.locked ? '10' : '8'} requis`;
+        notify('Lieu Verrouillé', req, 'warning', '🔒');
+      };
+    }
+    grid.appendChild(div);
+  });
+}
+
+// ─── INVENTORY HELPERS ───────────────────────────
+function addToInventory(itemKey, icon, name) {
+  const item = itemKey ? ITEMS[itemKey] : { icon, name, qty: 1 };
+  if (!item) return;
+
+  const existing = STATE.player.inventory.find(i => i.name === (item.name || name));
+  if (existing) {
+    existing.qty = (existing.qty || 1) + 1;
+  } else {
+    STATE.player.inventory.push({ ...item, qty: 1 });
+  }
+  saveGame();
+}
+
+function useInventoryItem(idx) {
+  const item = STATE.player.inventory[idx];
+  if (!item) return;
+
+  const itemData = Object.values(ITEMS).find(i => i.name === item.name);
+  if (itemData?.effect) {
+    itemData.effect();
+    item.qty--;
+    if (item.qty <= 0) STATE.player.inventory.splice(idx, 1);
+    notify('Objet Utilisé!', `${item.icon} ${item.name} utilisé!`, 'success', item.icon);
+    renderInventory();
+    updateHUD();
+    saveGame();
+  } else {
+    notify('Objet Passif', `${item.icon} ${item.name} — objet passif ou de quête`, 'quest', item.icon);
+  }
+}
+
+// ─── QUEST HELPERS ───────────────────────────────
+function startQuest(questId) {
+  if (STATE.player.quests.includes(questId) || STATE.player.questsDone.includes(questId)) return;
+  STATE.player.quests.push(questId);
+  const q = QUESTS_DATA[questId];
+  notify('Nouvelle Quête!', q?.name || questId, 'quest', '📜');
+  saveGame();
+}
+
+function advanceQuestStep(questId) {
+  if (!STATE.player.quests.includes(questId)) return;
+  gainXP(30);
+  notify('Quête Avancée', QUESTS_DATA[questId]?.name || questId, 'quest', '📜');
+}
+
+function completeQuest(questId) {
+  const idx = STATE.player.quests.indexOf(questId);
+  if (idx === -1) return;
+  STATE.player.quests.splice(idx, 1);
+  STATE.player.questsDone.push(questId);
+  STATE.player.stats.quests++;
+
+  const q = QUESTS_DATA[questId];
+  if (q?.rewards) {
+    gainXP(q.rewards.xp);
+    if (q.rewards.galleons) STATE.player.galleons += q.rewards.galleons;
+    if (q.rewards.item) addToInventory(null, q.rewards.item.icon, q.rewards.item.name);
+    if (q.rewards.skillXp) Object.entries(q.rewards.skillXp).forEach(([s,v]) => gainSkillXP(s,v));
+  }
+
+  notify('Quête Terminée!', `${q?.name || questId}`, 'success', '🏆');
+  updateHUD();
+  saveGame();
+}
+
+function gainRelation(npcId, amount) {
+  if (!STATE.player.relations[npcId]) STATE.player.relations[npcId] = 50;
+  STATE.player.relations[npcId] = clamp(STATE.player.relations[npcId] + amount, 0, 100);
+  saveGame();
+}
+
+// ─── SPELL COLOR HELPER ──────────────────────────
+function getSpellColor(type) {
+  const colors = { normal:'#4488ff', stun:'#ffff44', fire:'#ff4400', ice:'#44ffff',
+    heal:'#44ff44', confuse:'#ff44ff', dark:'#8844cc', light:'#ffffaa' };
+  return colors[type] || '#4488ff';
+}
+
+// ─── KEYBOARD INPUT ──────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (!STATE.game.started) return;
+  const keys = {
+    'i': () => Game.openInventory(),
+    'k': () => Game.openSkills(),
+    'q': () => Game.openQuests(),
+    'm': () => Game.openMap(),
+    'p': () => Game.openProfile(),
+    'Escape': () => {
+      Game.closeDialogue();
+      ['inventory','skills','quests','shop'].forEach(p => Game.closePanel(p));
+      document.getElementById('map-screen').style.display = 'none';
+      document.getElementById('world').style.display = 'block';
+    }
+  };
+  if (keys[e.key]) { e.preventDefault(); keys[e.key](); }
+});
+
+// ─── RANDOM EVENTS ───────────────────────────────
+setInterval(() => {
+  if (!STATE.game.started) return;
+  const events = [
+    () => { gainXP(5); floatText('+5 XP Bonus!', 'var(--gold)'); },
+    () => notify('Événement', 'Un fantôme traverse les couloirs... Studiosus!', 'quest', '👻'),
+    () => notify('Événement', 'Le journal magique fait état de troubles au Ministère!', 'warning', '📰'),
+    () => { STATE.player.galleons += 3; updateHUD(); notify('Chance!', 'Vous trouvez 3 Gallions par terre!', 'success', '🥇'); },
+    () => notify('Cours', 'Le Professeur McGonagall annonce un examen surprise demain!', 'warning', '📚'),
+    () => { gainSkillXP('sortileges', 5); notify('Pratique', 'Votre baguette vibre... +5 Sortilèges!', 'success', '🪄'); }
+  ];
+  if (rand(0,100) < 15) events[rand(0, events.length-1)]();
+}, 30000);
+
+// Init particles on load
+window.addEventListener('load', () => {
+  const body = document.getElementById('splash');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.style.cssText = `position:absolute;width:${rand(2,5)}px;height:${rand(2,5)}px;background:rgba(240,192,64,${Math.random()*0.6+0.2});border-radius:50%;left:${rand(0,100)}%;top:${rand(0,100)}%;animation:magicFloat ${3+Math.random()*5}s linear ${Math.random()*3}s infinite;box-shadow:0 0 10px rgba(240,192,64,0.5);`;
+    body.appendChild(p);
+  }
+});
+</script>
+</body>
+</html>
+HTMLEOF
+
+echo "File size: $(wc -c < /mnt/user-data/outputs/poudlard-chronicles.html) bytes"
+echo "Line count: $(wc -l < /mnt/user-data/outputs/poudlard-chronicles.html)"
